@@ -1,0 +1,38 @@
+name: Daily SOXL signal
+
+on:
+  schedule:
+    # 22:30 UTC = 07:30 KST (다음날). 매일 실행되지만 새 종가가 없는 날(주말/미국 휴장일)은
+    # run_daily.py가 자동으로 아무 것도 안 하고 넘어갑니다.
+    - cron: "30 22 * * *"
+  workflow_dispatch: {}  # Actions 탭에서 수동 실행 버튼으로도 테스트 가능
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Run daily signal calculation + KakaoTalk notification
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+        run: python run_daily.py
+
+      - name: Commit updated state back to the repo
+        run: |
+          git config user.name "soxl-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add state/ docs/latest.json
+          git diff --cached --quiet || git commit -m "state: $(date -u +%Y-%m-%d) daily update"
+          git push
