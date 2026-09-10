@@ -1,14 +1,25 @@
 {
   "portfolio_id": "maemae_stable",
-  "as_of_date": "2026-09-09",
-  "cash": 16205.82,
-  "total_shares": 0,
-  "open_positions": [],
+  "as_of_date": "2026-09-10",
+  "cash": 14699.439999999999,
+  "total_shares": 13,
+  "open_positions": [
+    {
+      "slot": 1,
+      "buy_date": "2026-09-10",
+      "buy_price": 115.76,
+      "qty": 13,
+      "cost": 1504.88,
+      "buy_fee": 1.5,
+      "target_price": 118.66,
+      "cutoff_date": "2026-09-24"
+    }
+  ],
   "pending_order": {
-    "slot": 1,
-    "order_price": 125.85,
-    "seed": 1620.582,
-    "for_date": "2026-09-10"
+    "slot": 2,
+    "order_price": 115.74,
+    "seed": 2430.873,
+    "for_date": "2026-09-11"
   },
   "compounded_principal": 16205.82,
   "slot_seed": {},

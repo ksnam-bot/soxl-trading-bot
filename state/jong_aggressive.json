@@ -1,8 +1,8 @@
 {
   "portfolio_id": "jong_aggressive",
-  "as_of_date": "2026-09-09",
-  "cash": 12212.75,
-  "total_shares": 40,
+  "as_of_date": "2026-09-10",
+  "cash": 9779.36,
+  "total_shares": 61,
   "open_positions": [
     {
       "slot": 1,
@@ -23,13 +23,23 @@
       "buy_fee": 2.52,
       "target_price": 129.27,
       "cutoff_date": "2026-09-23"
+    },
+    {
+      "slot": 3,
+      "buy_date": "2026-09-10",
+      "buy_price": 115.76,
+      "qty": 21,
+      "cost": 2430.96,
+      "buy_fee": 2.43,
+      "target_price": 118.89,
+      "cutoff_date": "2026-09-24"
     }
   ],
   "pending_order": {
-    "slot": 3,
-    "order_price": 126.58999999999999,
-    "seed": 2499.354286,
-    "for_date": "2026-09-10"
+    "slot": 4,
+    "order_price": 118.88,
+    "seed": 2653.635714,
+    "for_date": "2026-09-11"
   },
   "compounded_principal": null,
   "slot_seed": {
