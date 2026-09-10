@@ -1,0 +1,21 @@
+{
+  "portfolio_id": "maemae_stable",
+  "as_of_date": "2026-09-08",
+  "cash": 16205.82,
+  "total_shares": 0,
+  "open_positions": [],
+  "pending_order": {
+    "slot": 1,
+    "order_price": 123.25,
+    "seed": 1620.582,
+    "for_date": "2026-09-09"
+  },
+  "compounded_principal": 16205.82,
+  "slot_seed": {},
+  "slot_profit": {},
+  "history": [
+    {
+      "note": "2026-09-08 종가 기준으로 사용자의 실제 스프레드시트(4989 매매법)에서 가져온 초기 상태. 이후 기록은 run_daily.py가 자동으로 추가함."
+    }
+  ]
+}

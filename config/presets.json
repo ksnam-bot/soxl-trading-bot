@@ -1,0 +1,38 @@
+{
+  "aggressive": {
+    "_desc": "종사종팔 V4 (공격형) — 균등 비중, 슬롯별 복리",
+    "principal": 15000,
+    "split": 7,
+    "weights": [0.14285714, 0.14285714, 0.14285714, 0.14285714, 0.14285714, 0.14285714, 0.14285716],
+    "odgap": 0.10,
+    "target": 0.027,
+    "loss_days": 10,
+    "extrange": -0.20,
+    "comp": 1.0,
+    "fee": 0.001,
+    "sec": 0.0000206,
+    "order_type": "FIXODC",
+    "odcount": 2,
+    "step": 3,
+    "mocbuy": true,
+    "seed_mode": "per_slot"
+  },
+  "stable": {
+    "_desc": "4989 매매법 (안정형) — 비중/목표가 티어별 테이블, 계좌 전체 복리",
+    "principal": 15000,
+    "split": 7,
+    "weights": [0.10, 0.15, 0.20, 0.20, 0.15, 0.10, 0.10],
+    "odgap": -0.0001,
+    "target": 0.025,
+    "loss_days": 10,
+    "extrange": -0.20,
+    "comp": 1.0,
+    "fee": 0.001,
+    "sec": 0.0000206,
+    "order_type": "FIXODC",
+    "odcount": 2,
+    "step": null,
+    "mocbuy": true,
+    "seed_mode": "global"
+  }
+}

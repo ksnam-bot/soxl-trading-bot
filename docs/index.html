@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SOXL 매매 신호</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SOXL 신호" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23111827'/%3E%3Ctext x='50' y='62' font-size='42' text-anchor='middle' fill='%2334d399' font-family='-apple-system,sans-serif' font-weight='700'%3ES%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #16181d;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #059669;
+    --accent-bg: #ecfdf5;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --warn: #d97706;
+    --warn-bg: #fffbeb;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b0d10;
+      --card: #16191f;
+      --text: #e8eaed;
+      --muted: #9aa1ac;
+      --border: #262a33;
+      --accent: #34d399;
+      --accent-bg: #052e22;
+      --danger: #f87171;
+      --danger-bg: #2e1213;
+      --warn: #fbbf24;
+      --warn-bg: #2e2410;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0d10;
+    --card: #16191f;
+    --text: #e8eaed;
+    --muted: #9aa1ac;
+    --border: #262a33;
+    --accent: #34d399;
+    --accent-bg: #052e22;
+    --danger: #f87171;
+    --danger-bg: #2e1213;
+    --warn: #fbbf24;
+    --warn-bg: #2e2410;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: max(16px, env(safe-area-inset-top)) 16px 40px;
+    max-width: 560px;
+    margin-inline: auto;
+  }
+  header { margin-bottom: 18px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .updated { color: var(--muted); font-size: 12px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .card h2 { font-size: 17px; margin: 0 0 2px; }
+  .card .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  .section-title { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 6px; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 10px; font-size: 14px; }
+  .row + .row { margin-top: 4px; }
+  .tag { font-size: 11px; padding: 2px 7px; border-radius: 999px; font-weight: 600; }
+  .tag.buy { background: var(--accent-bg); color: var(--accent); }
+  .tag.sell-target { background: var(--accent-bg); color: var(--accent); }
+  .tag.sell-loss { background: var(--warn-bg); color: var(--warn); }
+  .tag.skip { background: var(--danger-bg); color: var(--danger); }
+  .ladder-line { background: var(--accent-bg); }
+  .empty { color: var(--muted); font-size: 13px; padding: 6px 2px; }
+  .price { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .err { color: var(--danger); font-size: 14px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>SOXL 매매 신호</h1>
+    <div class="updated" id="updated">불러오는 중…</div>
+  </header>
+  <div id="content"></div>
+
+<script>
+async function load() {
+  const content = document.getElementById('content');
+  try {
+    const res = await fetch('./latest.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('latest.json 없음');
+    const data = await res.json();
+    document.getElementById('updated').textContent =
+      '갱신: ' + new Date(data.generated_at).toLocaleString('ko-KR');
+    content.innerHTML = data.portfolios.map(renderPortfolio).join('');
+  } catch (e) {
+    content.innerHTML = '<div class="card"><div class="err">아직 데이터가 없습니다. GitHub Actions가 처음 실행되면 여기 표시됩니다.</div></div>';
+    document.getElementById('updated').textContent = '';
+  }
+}
+
+function fmt(n) { return '$' + Number(n).toFixed(2); }
+
+function renderPortfolio(p) {
+  let html = `<div class="card"><h2>${p.name}</h2>`;
+  html += `<div class="sub">${p.trading_date} 종가 ${fmt(p.close)}</div>`;
+
+  html += '<div class="section-title">어제 체결</div>';
+  let any = false;
+  if (p.filled_buy) {
+    any = true;
+    html += `<div class="row"><span><span class="tag buy">매수</span> ${p.filled_buy.slot}번 티어</span><span class="price">${fmt(p.filled_buy.buy_price)} × ${p.filled_buy.qty}주</span></div>`;
+  }
+  if (p.unfilled_buy_price != null) {
+    any = true;
+    html += `<div class="row"><span><span class="tag skip">미체결</span></span><span class="price">지정가 ${fmt(p.unfilled_buy_price)}</span></div>`;
+  }
+  for (const s of p.sells) {
+    any = true;
+    const tag = s.reason === 'target' ? 'sell-target' : 'sell-loss';
+    const label = s.reason === 'target' ? '목표매도' : '기한정리';
+    html += `<div class="row"><span><span class="tag ${tag}">${label}</span> ${s.slot}번 티어</span><span class="price">${fmt(s.sell_price)} × ${s.qty}주</span></div>`;
+  }
+  if (!any) html += '<div class="empty">새 체결 없음</div>';
+
+  html += '<div class="section-title">오늘 주문</div>';
+  if (p.no_open_slot_today) {
+    html += '<div class="empty">신규 매수 없음 (전 티어 보유 중)</div>';
+  } else if (p.pending_order && p.pending_order.ladder.length) {
+    for (const l of p.pending_order.ladder) {
+      html += `<div class="row ladder-line"><span>${p.pending_order.slot}번 티어 LOC 매수</span><span class="price">${fmt(l.price)} × ${l.qty}주</span></div>`;
+    }
+  } else {
+    html += '<div class="empty">신규 매수 주문 없음</div>';
+  }
+
+  if (p.open_positions.length) {
+    html += '<div class="section-title">매도 대기 중</div>';
+    for (const o of p.open_positions) {
+      html += `<div class="row"><span>${o.slot}번 ${fmt(o.buy_price)}×${o.qty}주</span><span class="price">→ ${fmt(o.target_price)} (${o.cutoff_date})</span></div>`;
+    }
+  }
+
+  html += '</div>';
+  return html;
+}
+
+load();
+</script>
+</body>
+</html>

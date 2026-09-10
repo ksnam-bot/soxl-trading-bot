@@ -1,0 +1,20 @@
+[
+  {
+    "id": "jong_aggressive",
+    "name": "종사종팔 V4 (공격형)",
+    "ticker": "SOXL",
+    "preset": "aggressive",
+    "state_file": "state/jong_aggressive.json",
+    "active": true,
+    "kakao_enabled": true
+  },
+  {
+    "id": "maemae_stable",
+    "name": "4989 매매법 (안정형)",
+    "ticker": "SOXL",
+    "preset": "stable",
+    "state_file": "state/maemae_stable.json",
+    "active": true,
+    "kakao_enabled": true
+  }
+]
