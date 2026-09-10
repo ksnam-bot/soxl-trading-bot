@@ -1,14 +1,14 @@
 {
   "portfolio_id": "maemae_stable",
-  "as_of_date": "2026-09-08",
+  "as_of_date": "2026-09-09",
   "cash": 16205.82,
   "total_shares": 0,
   "open_positions": [],
   "pending_order": {
     "slot": 1,
-    "order_price": 123.25,
+    "order_price": 125.85,
     "seed": 1620.582,
-    "for_date": "2026-09-09"
+    "for_date": "2026-09-10"
   },
   "compounded_principal": 16205.82,
   "slot_seed": {},
