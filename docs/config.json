@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-14T05:29:12.789482+00:00",
+  "generated_at": "2026-09-14T06:03:36.922555+00:00",
   "portfolios": [
     {
       "id": "jong_aggressive",
@@ -55,7 +55,7 @@
       "odcount": 2,
       "step": 3,
       "mocbuy": true,
-      "seed_mode": "per_slot"
+      "seed_mode": "round_lag"
     },
     {
       "id": "maemae_stable",
