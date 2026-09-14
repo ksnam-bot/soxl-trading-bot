@@ -182,19 +182,40 @@ def ladder_breakdown(cfg: PresetConfig, slot: int, seed: float, order_price: flo
     return lines
 
 
-def _size_seed(cfg: PresetConfig, state: PortfolioState, slot: int) -> float:
+def _size_seed_global(cfg: PresetConfig, state: PortfolioState, slot: int) -> float:
+    """seed_mode == 'global' (안정형): AS(계좌 전체 복리 baseline) * 그 슬롯의 비중."""
     weight = cfg.weights[slot - 1]
-    if cfg.seed_mode == "global":
-        base = state.compounded_principal if state.compounded_principal is not None else cfg.principal
-        target_seed = base * weight
-    else:  # per_slot
-        prev_seed = state.slot_seed.get(slot, cfg.principal * weight)
-        prev_profit = state.slot_profit.get(slot, 0.0)
-        if prev_profit >= 0:
-            target_seed = prev_seed + prev_profit * cfg.comp / cfg.split
+    base = state.compounded_principal if state.compounded_principal is not None else cfg.principal
+    return min(base * weight, state.cash)
+
+
+def _round_number(day_index: int, split: int) -> int:
+    return ((day_index - 1) // split) + 1
+
+
+def _round_is_start(day_index: int, split: int) -> bool:
+    return (day_index - 1) % split == 0
+
+
+def _round_lag_seed(cfg: PresetConfig, state: PortfolioState, for_day_index: int) -> float:
+    """seed_mode == 'round_lag' (공격형): SPLIT거래일짜리 '라운드' 단위 시드.
+
+    라운드 K의 시드 = 라운드(K-1)의 시드 + 라운드(K-2)에 '매수된' 포지션들의
+    실현손익 합 * 복리율 / SPLIT (그 합이 음수면 복리 반영 안 함). 라운드가 바뀌는
+    첫날에만 새로 계산하고, 그 라운드 안에서는 모든 매수가 같은 시드를 씁니다.
+    (스프레드시트 N열 수식을 그대로 재현 — 실제 과거 체결 수량으로 검증 완료.)
+    """
+    round_num = _round_number(for_day_index, cfg.split)
+    if _round_is_start(for_day_index, cfg.split):
+        if round_num <= 2:
+            theoretical = cfg.principal / cfg.split
         else:
-            target_seed = prev_seed
-    return min(target_seed, state.cash)
+            prev_seed = state.round_seed_history.get(round_num - 1, cfg.principal / cfg.split)
+            prev_profit = state.round_profit_history.get(round_num - 2, 0.0)
+            theoretical = prev_seed + (prev_profit * cfg.comp / cfg.split if prev_profit >= 0 else 0.0)
+        state.round_seed_history[round_num] = theoretical
+    seed = state.round_seed_history.get(round_num, cfg.principal / cfg.split)
+    return min(seed, state.cash)
 
 
 def process_trading_day(
@@ -210,6 +231,9 @@ def process_trading_day(
     day by day if catching up after an outage).
     """
     report = DayReport(trading_date=trading_date, close=close_price)
+
+    state.total_day_index += 1
+    today_round = _round_number(state.total_day_index, cfg.split)
 
     # --- Step 1: resolve yesterday's pending buy order against today's close ---
     po = state.pending_order
@@ -233,10 +257,9 @@ def process_trading_day(
                         buy_fee=fee,
                         target_price=target_price,
                         cutoff_date=cutoff_date,
+                        buy_round=today_round if cfg.seed_mode == "round_lag" else None,
                     )
                 )
-                if cfg.seed_mode == "per_slot":
-                    state.slot_seed[po.slot] = po.seed
                 report.filled_buy = BuyFillResult(slot=po.slot, buy_price=close_price, qty=qty, cost=cost, fee=fee)
         else:
             report.unfilled_buy_price = po.order_price
@@ -262,8 +285,8 @@ def process_trading_day(
         state.total_shares -= pos.qty
         profit = round(proceeds - sell_fee - (pos.cost + pos.buy_fee), 2)
         realized_today += profit
-        if cfg.seed_mode == "per_slot":
-            state.slot_profit[pos.slot] = profit
+        if cfg.seed_mode == "round_lag" and pos.buy_round is not None:
+            state.round_profit_history[pos.buy_round] = state.round_profit_history.get(pos.buy_round, 0.0) + profit
         report.sells.append(
             SellResult(
                 slot=pos.slot,
@@ -292,7 +315,10 @@ def process_trading_day(
         report.no_open_slot_today = True
         return report
 
-    seed = _size_seed(cfg, state, active_slot)
+    if cfg.seed_mode == "round_lag":
+        seed = _round_lag_seed(cfg, state, state.total_day_index + 1)
+    else:
+        seed = _size_seed_global(cfg, state, active_slot)
     odgap = cfg.odgap[active_slot - 1]
     odp = round_down(close_price * (1 + odgap), 2)
 

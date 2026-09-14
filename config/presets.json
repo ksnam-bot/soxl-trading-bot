@@ -15,7 +15,7 @@
     "odcount": 2,
     "step": 3,
     "mocbuy": true,
-    "seed_mode": "per_slot"
+    "seed_mode": "round_lag"
   },
   "stable": {
     "_desc": "4989 매매법 (안정형) — 비중/목표가 티어별 테이블, 계좌 전체 복리",

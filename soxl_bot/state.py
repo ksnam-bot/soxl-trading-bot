@@ -24,6 +24,7 @@ class TierPosition:
     buy_fee: float
     target_price: float
     cutoff_date: dt.date
+    buy_round: int | None = None  # seed_mode=="round_lag": which round this was bought in
 
     def to_json(self) -> dict:
         d = asdict(self)
@@ -66,11 +67,15 @@ class PortfolioState:
     total_shares: float = 0.0
     open_positions: list[TierPosition] = field(default_factory=list)
     pending_order: PendingOrder | None = None
-    # seed_mode == "global" (안정형)
+    # seed_mode == "global" (안정형): account-wide compounded principal
     compounded_principal: float | None = None
-    # seed_mode == "per_slot" (공격형): last seed used per slot / last realized profit per slot
-    slot_seed: dict[int, float] = field(default_factory=dict)
-    slot_profit: dict[int, float] = field(default_factory=dict)
+    # seed_mode == "round_lag" (공격형): SPLIT-trading-day "rounds". Round K's seed =
+    # round (K-1)'s seed + round (K-2)'s total realized profit * COMP / SPLIT (only if
+    # that profit was >= 0). total_day_index counts trading days processed since the
+    # portfolio started (1-based); round number = ((total_day_index-1)//SPLIT)+1.
+    total_day_index: int = 0
+    round_seed_history: dict[int, float] = field(default_factory=dict)
+    round_profit_history: dict[int, float] = field(default_factory=dict)
     history: list[dict] = field(default_factory=list)  # append-only daily log for auditing
 
     def to_json(self) -> dict:
@@ -82,8 +87,9 @@ class PortfolioState:
             "open_positions": [p.to_json() for p in self.open_positions],
             "pending_order": self.pending_order.to_json() if self.pending_order else None,
             "compounded_principal": self.compounded_principal,
-            "slot_seed": {str(k): v for k, v in self.slot_seed.items()},
-            "slot_profit": {str(k): v for k, v in self.slot_profit.items()},
+            "total_day_index": self.total_day_index,
+            "round_seed_history": {str(k): v for k, v in self.round_seed_history.items()},
+            "round_profit_history": {str(k): v for k, v in self.round_profit_history.items()},
             "history": self.history,
         }
 
@@ -97,8 +103,9 @@ class PortfolioState:
             open_positions=[TierPosition.from_json(p) for p in d.get("open_positions", [])],
             pending_order=PendingOrder.from_json(d["pending_order"]) if d.get("pending_order") else None,
             compounded_principal=d.get("compounded_principal"),
-            slot_seed={int(k): v for k, v in d.get("slot_seed", {}).items()},
-            slot_profit={int(k): v for k, v in d.get("slot_profit", {}).items()},
+            total_day_index=d.get("total_day_index", 0),
+            round_seed_history={int(k): v for k, v in d.get("round_seed_history", {}).items()},
+            round_profit_history={int(k): v for k, v in d.get("round_profit_history", {}).items()},
             history=d.get("history", []),
         )
 
