@@ -1,12 +1,64 @@
 {
-  "generated_at": "2026-09-14T06:03:36.922317+00:00",
+  "generated_at": "2026-09-14T06:35:59.307349+00:00",
   "combined": {
-    "cash": 16281.48,
-    "total_value": 16281.48,
-    "principal": 15000.0,
-    "return_pct": 0.08543199999999997
+    "cash": 28622.26,
+    "total_value": 33495.06,
+    "principal": 30000.0,
+    "return_pct": 0.11650199999999993
   },
   "portfolios": [
+    {
+      "id": "jong_aggressive",
+      "name": "종사종팔 V4 (공격형)",
+      "short_label": "공격형",
+      "trading_date": "2026-09-11",
+      "close": 121.82,
+      "cash": 12340.779999999999,
+      "holding_value": 4872.799999999999,
+      "total_value": 17213.579999999998,
+      "principal": 15000.0,
+      "return_pct": 0.14757199999999987,
+      "filled_buy": null,
+      "unfilled_buy_price": null,
+      "sells": [],
+      "no_open_slot_today": false,
+      "pending_order": {
+        "slot": 3,
+        "for_date": "2026-09-14",
+        "ladder": [
+          {
+            "price": 126.58999999999999,
+            "qty": 21
+          },
+          {
+            "price": 118.33,
+            "qty": 2
+          },
+          {
+            "price": 108.87,
+            "qty": 2
+          }
+        ]
+      },
+      "open_positions": [
+        {
+          "slot": 1,
+          "buy_date": "2026-09-08",
+          "buy_price": 123.27,
+          "qty": 20,
+          "target_price": 126.6,
+          "cutoff_date": "2026-09-22"
+        },
+        {
+          "slot": 2,
+          "buy_date": "2026-09-09",
+          "buy_price": 125.87,
+          "qty": 20,
+          "target_price": 129.27,
+          "cutoff_date": "2026-09-23"
+        }
+      ]
+    },
     {
       "id": "maemae_stable",
       "name": "4989 매매법 (안정형)",
