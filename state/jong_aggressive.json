@@ -1,8 +1,8 @@
 {
   "portfolio_id": "jong_aggressive",
-  "as_of_date": "2026-09-11",
-  "cash": 12340.779999999999,
-  "total_shares": 40,
+  "as_of_date": "2026-09-14",
+  "cash": 9809.999999999998,
+  "total_shares": 65,
   "open_positions": [
     {
       "slot": 1,
@@ -25,16 +25,27 @@
       "target_price": 129.27,
       "cutoff_date": "2026-09-23",
       "buy_round": 11
+    },
+    {
+      "slot": 3,
+      "buy_date": "2026-09-14",
+      "buy_price": 101.13,
+      "qty": 25,
+      "cost": 2528.25,
+      "buy_fee": 2.53,
+      "target_price": 103.87,
+      "cutoff_date": "2026-09-28",
+      "buy_round": 12
     }
   ],
   "pending_order": {
-    "slot": 3,
-    "order_price": 126.58999999999999,
+    "slot": 4,
+    "order_price": 103.86,
     "seed": 2721.771428285714,
-    "for_date": "2026-09-14"
+    "for_date": "2026-09-15"
   },
   "compounded_principal": null,
-  "total_day_index": 78,
+  "total_day_index": 79,
   "round_seed_history": {
     "11": 2653.635714,
     "12": 2721.771428285714
@@ -46,6 +57,15 @@
   "history": [
     {
       "note": "2026-09-08 종가 기준으로 사용자의 실제 스프레드시트(종사종팔 V4)에서 가져온 초기 상태. round_seed_history/round_profit_history는 라운드(=SPLIT거래일 단위) 기반 시드 복리 계산을 위한 값이며, 실제 시트의 K(라운드번호)/N(시드)/AE(포지션별 손익) 열을 직접 대조해서 산출함."
+    },
+    {
+      "date": "2026-09-14",
+      "type": "buy",
+      "slot": 3,
+      "price": 101.13,
+      "qty": 25,
+      "cost": 2528.25,
+      "fee": 2.53
     }
   ]
 }
