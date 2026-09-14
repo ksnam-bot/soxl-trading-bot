@@ -15,10 +15,10 @@ from pathlib import Path
 
 from soxl_bot.calendar_utils import next_trading_day
 from soxl_bot.config import load_portfolios, load_presets
-from soxl_bot.engine import process_trading_day
+from soxl_bot.engine import current_status_report, process_trading_day
 from soxl_bot.notify import format_combined_message, format_portfolio_report
 from soxl_bot.pricing import fetch_recent_closes
-from soxl_bot.public_summary import build_snapshot, config_snapshot, portfolio_summary
+from soxl_bot.public_summary import build_snapshot, config_snapshot, history_snapshot, portfolio_summary
 from soxl_bot.state import load_state, save_state
 
 BASE_DIR = Path(__file__).parent
@@ -30,6 +30,7 @@ def run(dry_run: bool = False) -> int:
 
     kakao_entries: list[tuple] = []
     public_summaries: list[dict] = []
+    history_states: list[tuple] = []
     had_output = False
 
     for pf in portfolios:
@@ -37,6 +38,7 @@ def run(dry_run: bool = False) -> int:
             continue
 
         state = load_state(pf.state_file)
+        history_states.append((pf, state))
         closes = fetch_recent_closes(pf.ticker, lookback_days=14)
         if not closes:
             print(f"[{pf.id}] yfinance returned no data, skipping", file=sys.stderr)
@@ -55,17 +57,20 @@ def run(dry_run: bool = False) -> int:
             last_report = report
             cursor = next_trading_day(cursor)
 
-        if last_report is None:
-            print(f"[{pf.id}] no new trading day to process (already up to date)")
-            continue
+        if last_report is not None:
+            had_output = True
+            save_state(state, pf.state_file)
+            display_report = last_report
+        else:
+            print(f"[{pf.id}] no new trading day to process yet (waiting on {cursor}'s close) — showing current status")
+            last_close = closes.get(state.as_of_date) or (closes[max(closes)] if closes else None)
+            display_report = current_status_report(pf.preset, state, last_close)
 
-        had_output = True
-        save_state(state, pf.state_file)
         print("=" * 60)
-        print(format_portfolio_report(pf, state, last_report))
-        public_summaries.append(portfolio_summary(pf, state, last_report))
+        print(format_portfolio_report(pf, state, display_report))
+        public_summaries.append(portfolio_summary(pf, state, display_report))
         if pf.kakao_enabled:
-            kakao_entries.append((pf, state, last_report))
+            kakao_entries.append((pf, state, display_report))
 
     docs_dir = BASE_DIR / "docs"
     docs_dir.mkdir(exist_ok=True)
@@ -79,6 +84,10 @@ def run(dry_run: bool = False) -> int:
     # Settings rarely change, but keep the mobile "설정값 보기" page in sync every run.
     (docs_dir / "config.json").write_text(
         json.dumps(config_snapshot(portfolios), ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+    (docs_dir / "history.json").write_text(
+        json.dumps(history_snapshot(history_states), ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
     if kakao_entries:

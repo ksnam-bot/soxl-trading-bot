@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SOXL 거래 이력</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SOXL 신호" />
+<link rel="stylesheet" href="./style.css" />
+<style>
+  .hist-date { font-size: 12px; color: var(--muted); font-weight: 700; margin: 16px 0 6px; }
+  .hist-date:first-child { margin-top: 0; }
+  select#portfolioFilter {
+    width: 100%;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>거래 이력</h1>
+    <div class="updated" id="updated">불러오는 중…</div>
+  </header>
+  <a href="./index.html" class="primary-tab">오늘의 신호</a>
+  <nav class="secondary-tabs">
+    <a href="./settings.html">설정값</a>
+    <a href="./positions.html">포지션 수정</a>
+    <a href="./history.html" class="active">거래 이력</a>
+  </nav>
+  <select id="portfolioFilter"><option value="">전체 계좌</option></select>
+  <div id="content"></div>
+
+<script>
+let ENTRIES = [];
+
+async function load() {
+  const content = document.getElementById('content');
+  try {
+    const res = await fetch('./history.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('history.json 없음');
+    const data = await res.json();
+    ENTRIES = data.entries || [];
+    document.getElementById('updated').textContent =
+      '갱신: ' + new Date(data.generated_at).toLocaleString('ko-KR');
+
+    const filter = document.getElementById('portfolioFilter');
+    const seen = new Map();
+    ENTRIES.forEach(e => seen.set(e.portfolio_id, e.portfolio_label));
+    seen.forEach((label, id) => {
+      const opt = document.createElement('option');
+      opt.value = id; opt.textContent = label;
+      filter.appendChild(opt);
+    });
+    filter.onchange = render;
+
+    render();
+  } catch (e) {
+    content.innerHTML = `<div class="card"><div class="err">아직 거래 이력이 없습니다. 매수/매도가 처음 체결되면 여기 쌓입니다.</div></div>`;
+    document.getElementById('updated').textContent = '';
+  }
+}
+
+function fmt2(n) { return '$' + Number(n).toFixed(2); }
+function pct(x) {
+  const v = Number(x) * 100;
+  return (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+}
+
+function render() {
+  const pfId = document.getElementById('portfolioFilter').value;
+  const filtered = pfId ? ENTRIES.filter(e => e.portfolio_id === pfId) : ENTRIES;
+  const content = document.getElementById('content');
+
+  if (!filtered.length) {
+    content.innerHTML = '<div class="card"><div class="empty">거래 이력이 없습니다.</div></div>';
+    return;
+  }
+
+  let html = '<div class="card">';
+  let lastDate = null;
+  for (const e of filtered) {
+    if (e.date !== lastDate) {
+      html += `<div class="hist-date">${e.date}</div>`;
+      lastDate = e.date;
+    }
+    html += renderEntry(e);
+  }
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+function renderEntry(e) {
+  const tag = e.type === 'buy' ? 'buy' : 'sell';
+  const label = e.type === 'buy' ? '매수' : (e.reason === 'target' ? '목표매도' : '기한정리매도');
+  let detail = `${e.portfolio_label} · ${e.slot}번 티어`;
+  if (e.type === 'sell') {
+    detail += ` · 매수 ${fmt2(e.buy_price)} → 매도 ${fmt2(e.price)} · 수익 ${e.profit >= 0 ? '+' : ''}${fmt2(e.profit)} (${pct(e.profit_pct)})`;
+  }
+  return `<div class="fill-line ${tag}">
+    <div class="headline">${label === '매수' ? '✅' : '🎯'} ${label} ${fmt2(e.price)} × ${e.qty}주</div>
+    <div class="detail">${detail}</div>
+  </div>`;
+}
+
+load();
+</script>
+</body>
+</html>

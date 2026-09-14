@@ -8,29 +8,57 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="SOXL 신호" />
 <link rel="stylesheet" href="./style.css" />
+<style>
+  details.advanced { margin-top: 18px; }
+  details.advanced > summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 10px 0;
+    list-style: none;
+  }
+  details.advanced > summary::-webkit-details-marker { display: none; }
+  details.advanced > summary::before { content: '▸ '; }
+  details.advanced[open] > summary::before { content: '▾ '; }
+  .quickfix-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; }
+  .quickfix-row label { flex: 1; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  .quickfix-row input {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+</style>
 </head>
 <body>
   <header>
     <h1>포지션 수정</h1>
     <div class="updated" id="updated">불러오는 중…</div>
   </header>
-  <nav class="tabs">
-    <a href="./index.html">오늘의 신호</a>
+  <a href="./index.html" class="primary-tab">오늘의 신호</a>
+  <nav class="secondary-tabs">
     <a href="./settings.html">설정값</a>
     <a href="./positions.html" class="active">포지션 수정</a>
+    <a href="./history.html">거래 이력</a>
   </nav>
   <div id="content"></div>
 
 <script src="./gh-common.js"></script>
 <script>
 let PORTFOLIOS = [];   // from config/portfolios.json via GitHub API (id, name, short_label, state_file, ...)
-let FEES = {};         // id -> fee rate, from docs/config.json (public, no auth needed)
+let PCFG = {};         // id -> { fee, target[], loss_days[] }, from docs/config.json (public, no auth needed)
 let STATE = {};        // id -> { data (full state json), sha, stateFile }
 
 async function load() {
   const content = document.getElementById('content');
   if (!hasGhCreds()) {
-    content.innerHTML = renderGhSetupForm('포지션(보유 티어, 현금, 대기 주문)을 실제 체결과 다르게 고치려면 이 저장소 쓰기 권한이 있는 개인 액세스 토큰이 필요합니다.');
+    content.innerHTML = renderGhSetupForm('체결 수량/가격이 실제와 다를 때 고치려면 이 저장소 쓰기 권한이 있는 개인 액세스 토큰이 필요합니다.');
     document.getElementById('updated').textContent = '';
     wireGhSetupForm(load);
     return;
@@ -40,8 +68,8 @@ async function load() {
   try {
     const cfgRes = await fetch('./config.json', { cache: 'no-store' });
     const cfgData = cfgRes.ok ? await cfgRes.json() : { portfolios: [] };
-    FEES = {};
-    cfgData.portfolios.forEach(p => { FEES[p.id] = p.fee; });
+    PCFG = {};
+    cfgData.portfolios.forEach(p => { PCFG[p.id] = { fee: p.fee, target: p.target, loss_days: p.loss_days }; });
 
     const portfoliosFile = await ghGetFile('config/portfolios.json');
     PORTFOLIOS = portfoliosFile.data;
@@ -65,9 +93,12 @@ async function load() {
   }
 }
 
+function roundUp2(x) { return Math.ceil(x * 100 - 1e-9) / 100; }
+function round2(x) { return Math.round(x * 100) / 100; }
+
 function render() {
   document.getElementById('content').innerHTML =
-    '<div class="help" style="margin-bottom:12px">실제 체결이 자동 계산과 다르면 여기서 직접 고칠 수 있습니다. 저장하면 바로 반영되고, 다음 자동 실행부터 이 값을 기준으로 계산됩니다.</div>' +
+    '<div class="help" style="margin-bottom:12px">주문을 실수로 다르게 넣었거나 체결이 다르게 됐을 때, 여기서 바로 고치면 됩니다. 저장하면 즉시 반영되고 다음 자동 실행부터 이 값 기준으로 계산됩니다.</div>' +
     PORTFOLIOS.map(renderPortfolio).join('');
   PORTFOLIOS.forEach(pf => wirePortfolio(pf));
 }
@@ -75,10 +106,26 @@ function render() {
 function renderPortfolio(pf) {
   const s = STATE[pf.id];
   const label = pf.short_label || pf.name;
-  let html = `<div class="card" id="card-${pf.id}"><h2>${label}</h2>`;
-  html += `<div class="sub">as_of_date: ${s.data.as_of_date || '-'}</div>`;
+  const todayPos = (s.data.open_positions || []).find(p => p.buy_date === s.data.as_of_date);
+  const idx = todayPos ? s.data.open_positions.indexOf(todayPos) : -1;
 
-  html += '<div class="section-title">현금</div>';
+  let html = `<div class="card"><h2>${label}</h2>`;
+  html += `<div class="sub">최근 처리일: ${s.data.as_of_date || '-'}</div>`;
+
+  if (todayPos) {
+    html += `<div class="section-title">오늘(${s.data.as_of_date}) 매수 체결 수정</div>`;
+    html += `<div class="quickfix-row">
+      <label>실제 체결가 <input id="qf-price-${pf.id}" type="number" step="0.01" value="${todayPos.buy_price}" /></label>
+      <label>실제 체결 수량 <input id="qf-qty-${pf.id}" type="number" step="1" value="${todayPos.qty}" /></label>
+    </div>
+    <div class="save-bar"><button class="save" id="qf-save-${pf.id}">이 체결 수정 저장</button></div>`;
+  } else {
+    html += `<div class="section-title">오늘 매수 체결 수정</div>`;
+    html += `<div class="empty">${s.data.as_of_date || '최근'} 날짜에 새로 매수 체결된 티어가 없습니다.</div>`;
+  }
+
+  html += `<details class="advanced"><summary>고급: 포지션/현금/대기주문 직접 관리</summary>`;
+  html += `<div class="section-title">현금</div>`;
   html += `<input class="tier-input" style="width:140px" id="cash-${pf.id}" type="number" step="0.01" value="${s.data.cash}" />`;
 
   html += '<div class="section-title">보유 중인 티어 (매도 대기)</div>';
@@ -88,7 +135,8 @@ function renderPortfolio(pf) {
   html += '<div class="section-title">대기 중인 매수 주문</div>';
   html += renderPendingOrder(pf.id, s.data.pending_order);
 
-  html += `<div class="save-bar"><button class="save" id="save-${pf.id}">이 계좌 저장</button></div>`;
+  html += `<div class="save-bar"><button class="save" id="save-${pf.id}">이 계좌 전체 저장</button></div>`;
+  html += '</details>';
   html += '</div>';
   return html;
 }
@@ -130,6 +178,13 @@ function renderPendingOrder(pfId, po) {
 
 function wirePortfolio(pf) {
   const id = pf.id;
+  const s = STATE[id];
+  const todayPos = (s.data.open_positions || []).find(p => p.buy_date === s.data.as_of_date);
+
+  if (todayPos) {
+    document.getElementById('qf-save-' + id).onclick = () => saveQuickFix(pf, todayPos);
+  }
+
   document.getElementById('cash-' + id).oninput = (e) => { STATE[id].data.cash = Number(e.target.value); };
 
   document.getElementById('addpos-' + id).onclick = () => {
@@ -166,13 +221,48 @@ function wirePortfolio(pf) {
   document.getElementById('save-' + id).onclick = () => savePortfolio(pf);
 }
 
+async function saveQuickFix(pf, pos) {
+  const id = pf.id;
+  const btn = document.getElementById('qf-save-' + id);
+  btn.disabled = true;
+  btn.textContent = '저장 중…';
+  try {
+    const cfg = PCFG[id] || { fee: 0, target: [], loss_days: [] };
+    const newPrice = Number(document.getElementById('qf-price-' + id).value);
+    const newQty = Number(document.getElementById('qf-qty-' + id).value);
+
+    const oldTotal = round2(pos.cost + pos.buy_fee);
+    const newCost = round2(newPrice * newQty);
+    const newFee = round2(newCost * cfg.fee);
+    const newTotal = round2(newCost + newFee);
+
+    STATE[id].data.cash = round2(STATE[id].data.cash + oldTotal - newTotal);
+    pos.buy_price = newPrice;
+    pos.qty = newQty;
+    pos.cost = newCost;
+    pos.buy_fee = newFee;
+    const targetRate = (cfg.target && cfg.target[pos.slot - 1] != null) ? cfg.target[pos.slot - 1] : 0;
+    pos.target_price = roundUp2(newPrice * (1 + targetRate));
+    STATE[id].data.total_shares = STATE[id].data.open_positions.reduce((sum, p) => sum + Number(p.qty), 0);
+
+    const result = await ghPutFile(STATE[id].stateFile, STATE[id].data, STATE[id].sha, `오늘 체결 정정: ${id} (웹 대시보드)`);
+    STATE[id].sha = result.content.sha;
+    toast('저장 완료 ✅ ' + (pf.short_label || pf.name));
+    render();
+  } catch (err) {
+    toast(err.message, 6000);
+    btn.disabled = false;
+    btn.textContent = '이 체결 수정 저장';
+  }
+}
+
 async function savePortfolio(pf) {
   const id = pf.id;
   const btn = document.getElementById('save-' + id);
   btn.disabled = true;
   btn.textContent = '저장 중…';
   try {
-    const fee = FEES[id] || 0;
+    const fee = (PCFG[id] && PCFG[id].fee) || 0;
     const data = STATE[id].data;
 
     // recompute derived fields so a later sell's profit calc stays consistent
@@ -201,7 +291,7 @@ async function savePortfolio(pf) {
     toast(err.message, 6000);
   } finally {
     btn.disabled = false;
-    btn.textContent = '이 계좌 저장';
+    btn.textContent = '이 계좌 전체 저장';
   }
 }
 

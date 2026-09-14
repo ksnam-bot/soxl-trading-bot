@@ -261,6 +261,17 @@ def process_trading_day(
                     )
                 )
                 report.filled_buy = BuyFillResult(slot=po.slot, buy_price=close_price, qty=qty, cost=cost, fee=fee)
+                state.history.append(
+                    {
+                        "date": trading_date.isoformat(),
+                        "type": "buy",
+                        "slot": po.slot,
+                        "price": close_price,
+                        "qty": qty,
+                        "cost": cost,
+                        "fee": fee,
+                    }
+                )
         else:
             report.unfilled_buy_price = po.order_price
         state.pending_order = None
@@ -299,6 +310,22 @@ def process_trading_day(
                 profit=profit,
                 reason=reason,
             )
+        )
+        state.history.append(
+            {
+                "date": trading_date.isoformat(),
+                "type": "sell",
+                "slot": pos.slot,
+                "buy_date": pos.buy_date.isoformat(),
+                "buy_price": pos.buy_price,
+                "price": close_price,
+                "qty": pos.qty,
+                "proceeds": proceeds,
+                "fee": sell_fee,
+                "profit": profit,
+                "profit_pct": round((close_price / pos.buy_price - 1) if pos.buy_price else 0.0, 6),
+                "reason": reason,
+            }
         )
     state.open_positions = still_open
 
@@ -341,4 +368,21 @@ def process_trading_day(
     else:
         state.pending_order = None
 
+    return report
+
+
+def current_status_report(cfg: PresetConfig, state: PortfolioState, last_close: float | None) -> DayReport:
+    """A non-mutating snapshot of "what's still pending right now", used when
+    there's no new trading day to advance through yet (e.g. today's close
+    isn't posted). Without this, a portfolio that's already caught up would
+    silently vanish from the notification/dashboard instead of continuing to
+    show its still-open pending order and positions.
+    """
+    report = DayReport(trading_date=state.as_of_date, close=last_close if last_close is not None else 0.0)
+    if state.pending_order:
+        po = state.pending_order
+        report.new_pending_order = po
+        report.new_pending_ladder = ladder_breakdown(cfg, po.slot, po.seed, po.order_price)
+    elif len(state.open_positions) >= cfg.split:
+        report.no_open_slot_today = True
     return report

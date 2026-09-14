@@ -96,6 +96,22 @@ def build_snapshot(portfolio_summaries: list[dict]) -> dict:
     }
 
 
+def history_snapshot(portfolio_states: list[tuple[PortfolioConfig, PortfolioState]]) -> dict:
+    """모든 계좌의 매수/매도 체결 이력을 하나로 합쳐서 최신순으로 정렬 — 거래 이력 페이지용."""
+    entries = []
+    for pf, state in portfolio_states:
+        label = pf.short_label or pf.name
+        for h in state.history:
+            if h.get("type") not in ("buy", "sell"):
+                continue
+            entries.append({**h, "portfolio_id": pf.id, "portfolio_label": label})
+    entries.sort(key=lambda e: (e["date"], e["portfolio_id"]), reverse=True)
+    return {
+        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "entries": entries,
+    }
+
+
 def config_snapshot(portfolios: list[PortfolioConfig]) -> dict:
     """Strategy parameters, for the mobile '설정값' 보기/편집 page."""
     out = []

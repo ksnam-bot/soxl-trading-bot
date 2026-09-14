@@ -30,9 +30,11 @@ config/portfolios.json  운용 중인 계좌 목록 (여러 개 추가 가능)
 state/*.json         계좌별 현재 상태 (보유 티어, 현금, 시드) — 매일 자동 갱신+커밋 (비공개 정보 포함)
 docs/latest.json     모바일 대시보드용 요약 (현금·총자산·수익률 포함) — 매일 자동 갱신
 docs/config.json     모바일 대시보드용 전략 설정 스냅샷 — 매일 자동 갱신
-docs/index.html      오늘의 신호 (GitHub Pages로 서빙, 홈화면에 추가해서 앱처럼 사용)
-docs/settings.html   설정값 보기/편집
-docs/positions.html  포지션(보유 티어/현금/대기주문) 직접 수정
+docs/history.json    모바일 대시보드용 매수/매도 체결 이력 — 매일 자동 갱신
+docs/index.html      오늘의 신호 (메인 화면, GitHub Pages로 서빙, 홈화면에 추가해서 앱처럼 사용)
+docs/settings.html   설정값 보기/편집 (보조 메뉴)
+docs/positions.html  오늘 체결 수정 + (고급) 포지션/현금/대기주문 직접 관리 (보조 메뉴)
+docs/history.html    매수/매도 체결 이력 (보조 메뉴)
 docs/gh-common.js    settings.html·positions.html이 함께 쓰는 GitHub API 연동 코드
 run_daily.py          매일 실행되는 진입점
 .github/workflows/daily.yml   GitHub Actions 스케줄
