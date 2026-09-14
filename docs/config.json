@@ -1,0 +1,117 @@
+{
+  "generated_at": "2026-09-14T01:21:49.516277+00:00",
+  "portfolios": [
+    {
+      "id": "jong_aggressive",
+      "name": "종사종팔 V4 (공격형)",
+      "short_label": "공격형",
+      "ticker": "SOXL",
+      "active": true,
+      "kakao_enabled": true,
+      "preset_name": "aggressive",
+      "principal": 15000.0,
+      "split": 7,
+      "weights": [
+        0.14285714,
+        0.14285714,
+        0.14285714,
+        0.14285714,
+        0.14285714,
+        0.14285714,
+        0.14285716
+      ],
+      "odgap": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "target": [
+        0.027,
+        0.027,
+        0.027,
+        0.027,
+        0.027,
+        0.027,
+        0.027
+      ],
+      "loss_days": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ],
+      "extrange": -0.2,
+      "comp": 1.0,
+      "fee": 0.001,
+      "sec": 2.06e-05,
+      "order_type": "FIXODC",
+      "odcount": 2,
+      "step": 3,
+      "mocbuy": true,
+      "seed_mode": "per_slot"
+    },
+    {
+      "id": "maemae_stable",
+      "name": "4989 매매법 (안정형)",
+      "short_label": "안정형",
+      "ticker": "SOXL",
+      "active": true,
+      "kakao_enabled": true,
+      "preset_name": "stable",
+      "principal": 15000.0,
+      "split": 7,
+      "weights": [
+        0.1,
+        0.15,
+        0.2,
+        0.2,
+        0.15,
+        0.1,
+        0.1
+      ],
+      "odgap": [
+        -0.0001,
+        -0.0001,
+        -0.0001,
+        -0.0001,
+        -0.0001,
+        -0.0001,
+        -0.0001
+      ],
+      "target": [
+        0.025,
+        0.025,
+        0.025,
+        0.025,
+        0.025,
+        0.025,
+        0.025
+      ],
+      "loss_days": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ],
+      "extrange": -0.2,
+      "comp": 1.0,
+      "fee": 0.001,
+      "sec": 2.06e-05,
+      "order_type": "FIXODC",
+      "odcount": 2,
+      "step": null,
+      "mocbuy": true,
+      "seed_mode": "global"
+    }
+  ]
+}
