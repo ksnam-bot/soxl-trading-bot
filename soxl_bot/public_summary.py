@@ -1,8 +1,7 @@
-"""Builds the small, non-sensitive JSON snapshot published to docs/latest.json
-for the mobile dashboard (GitHub Pages). Deliberately excludes cash/holding
-value/total account value — only trade signals (prices, quantities, dates),
-since this file ends up on a public (if unlisted) URL on the free GitHub
-Pages tier.
+"""Builds the small JSON snapshots published under docs/ for the mobile
+dashboard (GitHub Pages). At the user's request this now includes account
+value / return % — be aware this lands on a public (if unlisted) URL on the
+free GitHub Pages tier.
 """
 from __future__ import annotations
 
@@ -13,12 +12,28 @@ from .engine import DayReport
 from .state import PortfolioState
 
 
+def _return_pct(total_value: float, principal: float) -> float:
+    if principal <= 0:
+        return 0.0
+    return (total_value - principal) / principal
+
+
 def portfolio_summary(cfg: PortfolioConfig, state: PortfolioState, report: DayReport) -> dict:
+    holding_value = sum(p.qty * report.close for p in state.open_positions)
+    total_value = state.cash + holding_value
+    principal = cfg.preset.principal
+
     return {
         "id": cfg.id,
         "name": cfg.name,
+        "short_label": cfg.short_label,
         "trading_date": report.trading_date.isoformat(),
         "close": report.close,
+        "cash": state.cash,
+        "holding_value": holding_value,
+        "total_value": total_value,
+        "principal": principal,
+        "return_pct": _return_pct(total_value, principal),
         "filled_buy": (
             {
                 "slot": report.filled_buy.slot,
@@ -35,6 +50,9 @@ def portfolio_summary(cfg: PortfolioConfig, state: PortfolioState, report: DayRe
                 "sell_price": s.sell_price,
                 "qty": s.qty,
                 "reason": s.reason,
+                "buy_price": s.buy_price,
+                "profit": s.profit,
+                "profit_pct": (s.sell_price / s.buy_price - 1) if s.buy_price else 0.0,
             }
             for s in report.sells
         ],
@@ -63,14 +81,23 @@ def portfolio_summary(cfg: PortfolioConfig, state: PortfolioState, report: DayRe
 
 
 def build_snapshot(portfolio_summaries: list[dict]) -> dict:
+    total_cash = sum(p["cash"] for p in portfolio_summaries)
+    total_value = sum(p["total_value"] for p in portfolio_summaries)
+    total_principal = sum(p["principal"] for p in portfolio_summaries)
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "combined": {
+            "cash": total_cash,
+            "total_value": total_value,
+            "principal": total_principal,
+            "return_pct": _return_pct(total_value, total_principal),
+        },
         "portfolios": portfolio_summaries,
     }
 
 
 def config_snapshot(portfolios: list[PortfolioConfig]) -> dict:
-    """Non-sensitive strategy parameters, for the mobile '설정값 보기' page."""
+    """Strategy parameters, for the mobile '설정값' 보기/편집 page."""
     out = []
     for pf in portfolios:
         cfg = pf.preset

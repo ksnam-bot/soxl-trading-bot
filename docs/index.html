@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>SOXL 매매 신호</title>
+<title>오늘의 트레이딩 (SOXL)</title>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="SOXL 신호" />
@@ -12,7 +12,7 @@
 </head>
 <body>
   <header>
-    <h1>SOXL 매매 신호</h1>
+    <h1>오늘의 트레이딩 (SOXL)</h1>
     <div class="updated" id="updated">불러오는 중…</div>
   </header>
   <nav class="tabs">
@@ -30,53 +30,86 @@ async function load() {
     const data = await res.json();
     document.getElementById('updated').textContent =
       '갱신: ' + new Date(data.generated_at).toLocaleString('ko-KR');
-    content.innerHTML = data.portfolios.map(renderPortfolio).join('');
+    content.innerHTML = renderCombined(data.combined) +
+      data.portfolios.map(renderPortfolio).join('');
   } catch (e) {
     content.innerHTML = '<div class="card"><div class="err">아직 데이터가 없습니다. GitHub Actions가 처음 실행되면 여기 표시됩니다.</div></div>';
     document.getElementById('updated').textContent = '';
   }
 }
 
-function fmt(n) { return '$' + Number(n).toFixed(2); }
+function fmt(n) { return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
+function fmt2(n) { return '$' + Number(n).toFixed(2); }
+function pct(x) {
+  const v = Number(x) * 100;
+  const sign = v >= 0 ? '+' : '';
+  return sign + v.toFixed(2) + '%';
+}
+function retClass(x) { return Number(x) >= 0 ? 'ret pos' : 'ret neg'; }
+
+function renderCombined(c) {
+  if (!c) return '';
+  return `<div class="stat-hero">
+    <div class="label">합산 총자산</div>
+    <div class="value">${fmt(c.total_value)}</div>
+    <div class="${retClass(c.return_pct)}">${pct(c.return_pct)}</div>
+  </div>`;
+}
 
 function renderPortfolio(p) {
-  let html = `<div class="card"><h2>${p.name}</h2>`;
-  html += `<div class="sub">${p.trading_date} 종가 ${fmt(p.close)}</div>`;
+  const label = p.short_label || p.name;
+  let html = `<div class="stat-grid">
+    <div class="stat-card">
+      <div class="label">${label} 총자산</div>
+      <div class="value">${fmt(p.total_value)}</div>
+      <div class="${retClass(p.return_pct)}">${pct(p.return_pct)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">${label} 현금 / 평가</div>
+      <div class="value" style="font-size:14px">${fmt(p.cash)}</div>
+      <div class="value" style="font-size:14px">${fmt(p.holding_value)}</div>
+    </div>
+  </div>`;
+
+  html += `<div class="card"><h2>${label}</h2>`;
+  html += `<div class="sub">${p.trading_date} 종가 ${fmt2(p.close)}</div>`;
 
   html += '<div class="section-title">어제 체결</div>';
   let any = false;
   if (p.filled_buy) {
     any = true;
-    html += `<div class="row"><span><span class="tag buy">매수</span> ${p.filled_buy.slot}번 티어</span><span class="price">${fmt(p.filled_buy.buy_price)} × ${p.filled_buy.qty}주</span></div>`;
+    html += `<div class="fill-line buy"><div class="headline">✅ 매수 완료 ${fmt2(p.filled_buy.buy_price)} × ${p.filled_buy.qty}주</div><div class="detail">${p.filled_buy.slot}번 티어</div></div>`;
   }
   if (p.unfilled_buy_price != null) {
     any = true;
-    html += `<div class="row"><span><span class="tag skip">미체결</span></span><span class="price">지정가 ${fmt(p.unfilled_buy_price)}</span></div>`;
+    html += `<div class="fill-line"><div class="headline">⏭ 매수 미체결</div><div class="detail">지정가 ${fmt2(p.unfilled_buy_price)} 위에서 마감</div></div>`;
   }
   for (const s of p.sells) {
     any = true;
-    const tag = s.reason === 'target' ? 'sell-target' : 'sell-loss';
-    const label = s.reason === 'target' ? '목표매도' : '기한정리';
-    html += `<div class="row"><span><span class="tag ${tag}">${label}</span> ${s.slot}번 티어</span><span class="price">${fmt(s.sell_price)} × ${s.qty}주</span></div>`;
+    const label2 = s.reason === 'target' ? '🎯 목표가 도달 매도 완료' : '⏰ 보유기한 만료 정리매도 완료';
+    const profitTxt = `매수 ${fmt2(s.buy_price)} → 매도 ${fmt2(s.sell_price)} · 수익 ${s.profit >= 0 ? '+' : ''}${fmt2(s.profit)} (${pct(s.profit_pct)})`;
+    html += `<div class="fill-line sell"><div class="headline">${label2} ${s.qty}주</div><div class="detail">${profitTxt}</div></div>`;
   }
   if (!any) html += '<div class="empty">새 체결 없음</div>';
 
-  html += '<div class="section-title">오늘 주문</div>';
+  html += '<div class="section-title">오늘 매수 주문</div>';
   if (p.no_open_slot_today) {
     html += '<div class="empty">신규 매수 없음 (전 티어 보유 중)</div>';
   } else if (p.pending_order && p.pending_order.ladder.length) {
     for (const l of p.pending_order.ladder) {
-      html += `<div class="row ladder-line"><span>${p.pending_order.slot}번 티어 LOC 매수</span><span class="price">${fmt(l.price)} × ${l.qty}주</span></div>`;
+      html += `<div class="order-line buy"><span>${fmt2(l.price)} × ${l.qty}주</span><span class="slot-badge">${p.pending_order.slot}번</span></div>`;
     }
   } else {
     html += '<div class="empty">신규 매수 주문 없음</div>';
   }
 
+  html += '<div class="section-title">오늘 매도 주문</div>';
   if (p.open_positions.length) {
-    html += '<div class="section-title">매도 대기 중</div>';
     for (const o of p.open_positions) {
-      html += `<div class="row"><span>${o.slot}번 ${fmt(o.buy_price)}×${o.qty}주</span><span class="price">→ ${fmt(o.target_price)} (${o.cutoff_date})</span></div>`;
+      html += `<div class="order-line sell"><span>${fmt2(o.target_price)} × ${o.qty}주</span><span class="slot-badge">${o.slot}번</span></div>`;
     }
+  } else {
+    html += '<div class="empty">매도 주문 없음 (보유 티어 없음)</div>';
   }
 
   html += '</div>';

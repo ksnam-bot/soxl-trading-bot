@@ -21,53 +21,200 @@
   <div id="content"></div>
 
 <script>
-async function load() {
-  const content = document.getElementById('content');
-  try {
-    const res = await fetch('./config.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error('config.json 없음');
-    const data = await res.json();
-    document.getElementById('updated').textContent =
-      '갱신: ' + new Date(data.generated_at).toLocaleString('ko-KR');
-    content.innerHTML = data.portfolios.map(renderPortfolio).join('');
-  } catch (e) {
-    content.innerHTML = '<div class="card"><div class="err">아직 데이터가 없습니다. GitHub Actions가 처음 실행되면 여기 표시됩니다.</div></div>';
-    document.getElementById('updated').textContent = '';
-  }
+const LS_OWNER = 'soxl_gh_owner', LS_REPO = 'soxl_gh_repo', LS_TOKEN = 'soxl_gh_token', LS_BRANCH = 'soxl_gh_branch';
+
+function ghCreds() {
+  return {
+    owner: localStorage.getItem(LS_OWNER) || '',
+    repo: localStorage.getItem(LS_REPO) || '',
+    token: localStorage.getItem(LS_TOKEN) || '',
+    branch: localStorage.getItem(LS_BRANCH) || 'main',
+  };
+}
+function hasGhCreds() {
+  const c = ghCreds();
+  return !!(c.owner && c.repo && c.token);
+}
+function saveGhCreds(owner, repo, token, branch) {
+  localStorage.setItem(LS_OWNER, owner);
+  localStorage.setItem(LS_REPO, repo);
+  localStorage.setItem(LS_TOKEN, token);
+  localStorage.setItem(LS_BRANCH, branch || 'main');
+}
+function clearGhCreds() {
+  [LS_OWNER, LS_REPO, LS_TOKEN, LS_BRANCH].forEach(k => localStorage.removeItem(k));
 }
 
-function pct(x) {
+function b64encodeUnicode(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+function b64decodeUnicode(b64) {
+  const binary = atob(b64.replace(/\n/g, ''));
+  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+async function ghGetFile(path) {
+  const c = ghCreds();
+  const res = await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${path}?ref=${c.branch}`, {
+    headers: { Authorization: `Bearer ${c.token}`, Accept: 'application/vnd.github+json' },
+  });
+  if (!res.ok) throw new Error(`GitHub 읽기 실패 (${res.status}) ${path}`);
+  const json = await res.json();
+  return { sha: json.sha, data: JSON.parse(b64decodeUnicode(json.content)) };
+}
+
+async function ghPutFile(path, dataObj, sha, message) {
+  const c = ghCreds();
+  const content = b64encodeUnicode(JSON.stringify(dataObj, null, 2) + '\n');
+  const res = await fetch(`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${path}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${c.token}`,
+      Accept: 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ message, content, sha, branch: c.branch }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`GitHub 저장 실패 (${res.status}): ${body.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+async function testGhConnection(owner, repo, token) {
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+  });
+  if (!res.ok) throw new Error(`연결 실패 (${res.status}) — 저장소 이름이나 토큰을 확인해주세요`);
+  return res.json();
+}
+
+function toast(msg, ms = 3500) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+
+function fmtPct(x, decimals = 2) {
   const v = Number(x) * 100;
-  const decimals = Math.abs(v) < 0.01 ? 5 : 2;
-  return v.toFixed(decimals).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') + '%';
+  const d = Math.abs(v) < 0.01 && v !== 0 ? 5 : decimals;
+  return v.toFixed(d).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') + '%';
 }
 function money(x) { return '$' + Number(x).toLocaleString('en-US'); }
 
+let CONFIG_DATA = null; // raw docs/config.json, for read-only display
+let editingId = null;   // portfolio id currently in edit mode
+
+async function load() {
+  const content = document.getElementById('content');
+  if (!hasGhCreds()) {
+    content.innerHTML = renderSetupForm();
+    document.getElementById('updated').textContent = '';
+    wireSetupForm();
+    return;
+  }
+  try {
+    const res = await fetch('./config.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('config.json 없음');
+    CONFIG_DATA = await res.json();
+    document.getElementById('updated').innerHTML =
+      '갱신: ' + new Date(CONFIG_DATA.generated_at).toLocaleString('ko-KR') +
+      ' · <a href="#" id="disconnect" style="color:var(--muted)">GitHub 연결 해제</a>';
+    render();
+    document.getElementById('disconnect').onclick = (e) => {
+      e.preventDefault();
+      clearGhCreds();
+      load();
+    };
+  } catch (e) {
+    content.innerHTML = `<div class="card"><div class="err">${e.message}</div></div>`;
+  }
+}
+
+function renderSetupForm() {
+  return `<div class="card">
+    <h2>GitHub 연결</h2>
+    <div class="sub">설정을 여기서 바로 바꾸려면, 이 저장소에만 쓰기 권한을 주는 개인 액세스 토큰이 필요합니다.</div>
+    <div class="help">
+      1. github.com 우측 상단 프로필 → <b>Settings</b> → 맨 아래 <b>Developer settings</b><br>
+      2. <b>Personal access tokens → Fine-grained tokens → Generate new token</b><br>
+      3. Repository access: <b>Only select repositories</b> → 이 저장소 선택<br>
+      4. Permissions → <b>Contents: Read and write</b> 로 설정 → Generate token<br>
+      5. 생성된 토큰(한 번만 보여줌)을 복사해서 아래에 입력
+    </div>
+    <form class="setup-form" id="setupForm">
+      <input name="owner" placeholder="GitHub 계정명 (예: khbasket)" required />
+      <input name="repo" placeholder="저장소 이름 (예: soxl-trading-bot)" required />
+      <input name="token" type="password" placeholder="개인 액세스 토큰 (ghp_... 또는 github_pat_...)" required />
+      <button type="submit">연결하기</button>
+    </form>
+  </div>`;
+}
+
+function wireSetupForm() {
+  document.getElementById('setupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const owner = f.owner.value.trim(), repo = f.repo.value.trim(), token = f.token.value.trim();
+    try {
+      await testGhConnection(owner, repo, token);
+      saveGhCreds(owner, repo, token, 'main');
+      toast('연결 성공 ✅');
+      load();
+    } catch (err) {
+      toast(err.message, 5000);
+    }
+  });
+}
+
+function render() {
+  document.getElementById('content').innerHTML = CONFIG_DATA.portfolios.map(renderPortfolio).join('');
+  CONFIG_DATA.portfolios.forEach(p => {
+    const btn = document.getElementById('edit-' + p.id);
+    if (btn) btn.onclick = () => { editingId = (editingId === p.id) ? null : p.id; render(); };
+  });
+  if (editingId) wireEditForm(CONFIG_DATA.portfolios.find(p => p.id === editingId));
+}
+
 function renderPortfolio(p) {
-  let html = `<div class="card"><h2>${p.name}</h2>`;
+  const label = p.short_label || p.name;
+  const isEditing = editingId === p.id;
+  let html = `<div class="card"><button class="edit-toggle" id="edit-${p.id}">${isEditing ? '취소' : '편집'}</button>`;
+  html += `<h2>${label}</h2>`;
   html += `<div class="sub">${p.ticker} · ${p.preset_name} 프리셋 ${p.active ? '' : '(비활성)'} ${p.kakao_enabled ? '' : '· 알림 꺼짐'}</div>`;
 
-  html += '<div class="section-title">기본값</div>';
-  html += '<div class="kv">';
-  html += pill('초기원금', money(p.principal));
-  html += pill('시드분할', p.split + '개');
-  html += pill('복리율', pct(p.comp));
-  html += pill('매매수수료', pct(p.fee));
-  html += pill('세금(SEC 등)', pct(p.sec));
-  html += pill('추가매수범위', pct(p.extrange));
-  html += pill('주문방식', p.order_type === 'FIXODC' ? '건수 고정' : '수량 고정');
-  html += pill('추가주문건수', p.odcount);
-  if (p.step != null) html += pill('수량스텝', p.step);
-  html += pill('MOC날 매수', p.mocbuy ? 'ON' : 'OFF');
-  html += pill('시드 복리방식', p.seed_mode === 'global' ? '계좌 전체' : '슬롯별');
-  html += '</div>';
+  if (isEditing) {
+    html += renderEditForm(p);
+  } else {
+    html += '<div class="section-title">기본값</div><div class="kv">';
+    html += pill('초기원금', money(p.principal));
+    html += pill('시드분할', p.split + '개');
+    html += pill('복리율', fmtPct(p.comp));
+    html += pill('매매수수료', fmtPct(p.fee));
+    html += pill('세금(SEC 등)', fmtPct(p.sec));
+    html += pill('추가매수범위', fmtPct(p.extrange));
+    html += pill('주문방식', p.order_type === 'FIXODC' ? '건수 고정' : '수량 고정');
+    html += pill('추가주문건수', p.odcount);
+    if (p.step != null) html += pill('수량스텝', p.step);
+    html += pill('MOC날 매수', p.mocbuy ? 'ON' : 'OFF');
+    html += pill('알림', p.kakao_enabled ? 'ON' : 'OFF');
+    html += pill('운용상태', p.active ? '활성' : '비활성');
+    html += '</div>';
 
-  html += '<div class="section-title">티어별 설정</div>';
-  html += '<table class="tiers"><thead><tr><th>티어</th><th>비중</th><th>ODGAP</th><th>목표</th><th>손절일</th></tr></thead><tbody>';
-  for (let i = 0; i < p.split; i++) {
-    html += `<tr><td>${i + 1}번</td><td>${pct(p.weights[i])}</td><td>${pct(p.odgap[i])}</td><td>+${pct(p.target[i])}</td><td>${p.loss_days[i]}영업일</td></tr>`;
+    html += '<div class="section-title">티어별 설정</div>';
+    html += '<table class="tiers"><thead><tr><th>티어</th><th>비중</th><th>ODGAP</th><th>목표</th><th>손절일</th></tr></thead><tbody>';
+    for (let i = 0; i < p.split; i++) {
+      html += `<tr><td>${i + 1}번</td><td>${fmtPct(p.weights[i])}</td><td>${fmtPct(p.odgap[i])}</td><td>+${fmtPct(p.target[i])}</td><td>${p.loss_days[i]}영업일</td></tr>`;
+    }
+    html += '</tbody></table>';
   }
-  html += '</tbody></table>';
 
   html += '</div>';
   return html;
@@ -75,6 +222,96 @@ function renderPortfolio(p) {
 
 function pill(label, value) {
   return `<div class="pill">${label} <b>${value}</b></div>`;
+}
+
+function renderEditForm(p) {
+  let html = '<div class="section-title">기본값 (%는 % 단위로 입력)</div><div class="kv">';
+  html += editPill('복리율(%)', 'comp', (p.comp * 100));
+  html += editPill('매매수수료(%)', 'fee', (p.fee * 100));
+  html += editPill('세금(%)', 'sec', (p.sec * 100), 6);
+  html += editPill('추가매수범위(%)', 'extrange', (p.extrange * 100));
+  html += editPill('추가주문건수', 'odcount', p.odcount, 0);
+  html += `<div class="pill editable">MOC날 매수 <input type="checkbox" id="f-mocbuy" ${p.mocbuy ? 'checked' : ''} /></div>`;
+  html += `<div class="pill editable">카카오 알림 <input type="checkbox" id="f-kakao" ${p.kakao_enabled ? 'checked' : ''} /></div>`;
+  html += `<div class="pill editable">운용중 <input type="checkbox" id="f-active" ${p.active ? 'checked' : ''} /></div>`;
+  html += '</div>';
+  html += '<div class="help">초기원금 · 시드분할 · 주문방식은 이미 시작된 계좌 구조와 얽혀있어서 여기서는 못 바꿉니다.</div>';
+
+  html += '<div class="section-title">티어별 설정 (% 단위)</div>';
+  html += '<table class="tiers"><thead><tr><th>티어</th><th>비중%</th><th>ODGAP%</th><th>목표%</th><th>손절일</th></tr></thead><tbody>';
+  for (let i = 0; i < p.split; i++) {
+    html += `<tr><td>${i + 1}번</td>
+      <td><input class="tier-input" id="w-${i}" type="number" step="0.01" value="${(p.weights[i] * 100).toFixed(2)}" /></td>
+      <td><input class="tier-input" id="g-${i}" type="number" step="0.01" value="${(p.odgap[i] * 100).toFixed(4)}" /></td>
+      <td><input class="tier-input" id="t-${i}" type="number" step="0.01" value="${(p.target[i] * 100).toFixed(2)}" /></td>
+      <td><input class="tier-input" id="l-${i}" type="number" step="1" value="${p.loss_days[i]}" /></td>
+      </tr>`;
+  }
+  html += '</tbody></table>';
+
+  html += `<div class="save-bar">
+    <button class="cancel" id="cancelBtn">취소</button>
+    <button class="save" id="saveBtn">저장</button>
+  </div>`;
+  return html;
+}
+
+function editPill(label, id, value, decimals = 4) {
+  return `<div class="pill editable">${label} <input class="kv-input" id="f-${id}" type="number" step="0.0001" value="${Number(value).toFixed(decimals)}" /></div>`;
+}
+
+function wireEditForm(p) {
+  document.getElementById('cancelBtn').onclick = () => { editingId = null; render(); };
+  document.getElementById('saveBtn').onclick = () => saveEdits(p);
+}
+
+async function saveEdits(p) {
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = '저장 중…';
+  try {
+    const weights = [], odgap = [], target = [], loss_days = [];
+    for (let i = 0; i < p.split; i++) {
+      weights.push(Number(document.getElementById('w-' + i).value) / 100);
+      odgap.push(Number(document.getElementById('g-' + i).value) / 100);
+      target.push(Number(document.getElementById('t-' + i).value) / 100);
+      loss_days.push(parseInt(document.getElementById('l-' + i).value, 10));
+    }
+    const updates = {
+      weights, odgap, target, loss_days,
+      comp: Number(document.getElementById('f-comp').value) / 100,
+      fee: Number(document.getElementById('f-fee').value) / 100,
+      sec: Number(document.getElementById('f-sec').value) / 100,
+      extrange: Number(document.getElementById('f-extrange').value) / 100,
+      odcount: parseInt(document.getElementById('f-odcount').value, 10),
+      mocbuy: document.getElementById('f-mocbuy').checked,
+    };
+    const kakao_enabled = document.getElementById('f-kakao').checked;
+    const active = document.getElementById('f-active').checked;
+
+    // 1) config/presets.json
+    const presetsFile = await ghGetFile('config/presets.json');
+    if (!presetsFile.data[p.preset_name]) throw new Error(`presets.json에 "${p.preset_name}" 프리셋이 없습니다`);
+    Object.assign(presetsFile.data[p.preset_name], updates);
+    await ghPutFile('config/presets.json', presetsFile.data, presetsFile.sha, `설정 변경: ${p.preset_name} (웹 대시보드)`);
+
+    // 2) config/portfolios.json (active / kakao_enabled)
+    const portfoliosFile = await ghGetFile('config/portfolios.json');
+    const entry = portfoliosFile.data.find(x => x.id === p.id);
+    if (!entry) throw new Error(`portfolios.json에 "${p.id}"가 없습니다`);
+    entry.active = active;
+    entry.kakao_enabled = kakao_enabled;
+    await ghPutFile('config/portfolios.json', portfoliosFile.data, portfoliosFile.sha, `설정 변경: ${p.id} 활성/알림 (웹 대시보드)`);
+
+    toast('저장 완료 ✅ 다음 자동 실행부터 반영됩니다');
+    editingId = null;
+    // Note: docs/config.json itself only updates on the next scheduled/manual Action run.
+  } catch (err) {
+    toast(err.message, 6000);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = '저장';
+  }
 }
 
 load();

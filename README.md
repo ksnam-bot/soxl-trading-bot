@@ -76,11 +76,29 @@ run_daily.py          매일 실행되는 진입점
 커밋해둔 `docs/latest.json`을 그냥 읽어서 보여주기만 합니다.
 
 > ⚠️ **주의**: GitHub Pages 무료 요금제는 **퍼블릭(공개) 저장소에서만** 페이지를 서빙할 수
-> 있습니다. `docs/latest.json`에는 **현금 잔고·총 평가금액 같은 민감한 숫자는 일부러
-> 빼뒀고**, 매수/매도 지정가·수량·티어 번호 같은 신호 정보만 담았습니다. 그래도 URL을 아는
-> 사람은 누구나 볼 수 있는 페이지라는 점은 감안해주세요. 완전히 비공개로 하고 싶다면 GitHub
-> Pro(유료)로 업그레이드해서 프라이빗 저장소로 Pages를 쓰거나, 이 페이지 없이 카카오톡
-> 알림만 쓰는 것도 방법입니다.
+> 있습니다. `docs/latest.json`에는 사용자 요청으로 **현금·평가금액·총자산·수익률까지 포함**돼
+> 있습니다 — URL을 아는 사람은 누구나 볼 수 있는 페이지라는 점 감안해주세요. 완전히 비공개로
+> 하고 싶다면 GitHub Pro(유료)로 업그레이드해서 프라이빗 저장소로 Pages를 쓰면 됩니다.
+
+## 설정값을 대시보드에서 직접 편집하기
+
+`docs/settings.html`의 **편집** 버튼으로 티어별 비중/ODGAP/목표/손절일, 수수료, MOC매수 여부,
+계좌 활성/알림 여부를 아이폰에서 바로 바꿀 수 있습니다. GitHub Pages는 정적 페이지라 자체
+저장 기능이 없어서, **GitHub API를 브라우저에서 직접 호출**해 저장소의 `config/presets.json`,
+`config/portfolios.json`을 갱신하는 방식으로 동작합니다 (별도 서버 없음).
+
+**최초 1회, GitHub 개인 액세스 토큰(PAT) 발급이 필요합니다** (설정값 탭에 처음 들어가면 안내가
+뜹니다):
+1. github.com 우측 상단 프로필 → **Settings** → 맨 아래 **Developer settings**
+2. **Personal access tokens → Fine-grained tokens → Generate new token**
+3. Repository access: **Only select repositories** → 이 저장소만 선택 (전체 계정 권한 주지 않기)
+4. Permissions → **Contents: Read and write**로 설정 → Generate token
+5. 생성된 토큰(한 번만 보여줌)을 복사해서 대시보드의 설정 화면에 붙여넣기
+
+토큰은 그 아이폰/브라우저의 **로컬 저장소(localStorage)에만** 저장되고 다른 곳으로 전송되지
+않습니다. 저장을 누르면 바로 커밋되고, **다음 자동 실행(다음날 아침)부터 반영**됩니다 —
+당일 카카오톡 메시지에는 반영 안 됩니다. 초기원금·시드분할수·주문방식처럼 이미 시작된 계좌
+구조와 얽힌 값은 편집 화면에서 일부러 뺐습니다 (바꾸면 기존 보유 티어 계산이 꼬일 수 있음).
 
 **설정 방법**
 1. 저장소가 아직 Private이면 **Settings > General > Danger Zone > Change visibility > Public**

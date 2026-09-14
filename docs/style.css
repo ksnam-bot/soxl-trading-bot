@@ -10,6 +10,8 @@
   --danger-bg: #fef2f2;
   --warn: #d97706;
   --warn-bg: #fffbeb;
+  --sell: #2563eb;
+  --sell-bg: #eff6ff;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -25,6 +27,8 @@
     --danger-bg: #2e1213;
     --warn: #fbbf24;
     --warn-bg: #2e2410;
+    --sell: #60a5fa;
+    --sell-bg: #0b2447;
   }
 }
 :root[data-theme="dark"] {
@@ -39,6 +43,8 @@
   --danger-bg: #2e1213;
   --warn: #fbbf24;
   --warn-bg: #2e2410;
+  --sell: #60a5fa;
+  --sell-bg: #0b2447;
 }
 * { box-sizing: border-box; }
 body {
@@ -118,3 +124,133 @@ table.tiers td:first-child, table.tiers th:first-child { text-align: left; color
   font-size: 12px;
 }
 .kv .pill b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* summary stat cards */
+.stat-hero {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.stat-hero .label { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+.stat-hero .value { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat-hero .ret { font-size: 15px; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.ret.pos { color: var(--accent); }
+.ret.neg { color: var(--danger); }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stat-grid .stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-grid .stat-card .label { color: var(--muted); font-size: 12px; margin-bottom: 3px; }
+.stat-grid .stat-card .value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat-grid .stat-card .ret { font-size: 12px; font-weight: 600; margin-top: 2px; }
+
+/* order rows: price/qty first, tier as a secondary badge */
+.order-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.order-line + .order-line { margin-top: 4px; }
+.order-line.buy { background: var(--accent-bg); color: var(--accent); }
+.order-line.sell { background: var(--sell-bg); color: var(--sell); }
+.order-line .slot-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--bg);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-left: 8px;
+}
+.fill-line { padding: 8px 10px; border-radius: 10px; font-size: 14px; }
+.fill-line.buy { background: var(--accent-bg); }
+.fill-line.sell { background: var(--sell-bg); }
+.fill-line .headline { font-weight: 700; }
+.fill-line .detail { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.fill-line + .fill-line { margin-top: 4px; }
+
+/* settings edit mode */
+.edit-toggle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  float: right;
+  cursor: pointer;
+}
+input.tier-input, input.kv-input {
+  width: 64px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.kv .pill.editable { padding: 4px 8px; }
+.kv .pill.editable input { margin-left: 4px; }
+.save-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.save-bar button {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.save-bar .save { background: var(--accent); color: #fff; }
+.save-bar .cancel { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 13px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.2);
+  z-index: 50;
+}
+.setup-form { display: flex; flex-direction: column; gap: 10px; }
+.setup-form input {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.setup-form button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+.help { color: var(--muted); font-size: 12px; line-height: 1.5; }
