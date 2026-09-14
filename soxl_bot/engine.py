@@ -325,6 +325,7 @@ def process_trading_day(
                 "profit": profit,
                 "profit_pct": round((close_price / pos.buy_price - 1) if pos.buy_price else 0.0, 6),
                 "reason": reason,
+                "buy_round": pos.buy_round,
             }
         )
     state.open_positions = still_open

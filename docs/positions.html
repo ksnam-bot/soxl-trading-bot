@@ -69,7 +69,9 @@ async function load() {
     const cfgRes = await fetch('./config.json', { cache: 'no-store' });
     const cfgData = cfgRes.ok ? await cfgRes.json() : { portfolios: [] };
     PCFG = {};
-    cfgData.portfolios.forEach(p => { PCFG[p.id] = { fee: p.fee, target: p.target, loss_days: p.loss_days }; });
+    cfgData.portfolios.forEach(p => {
+      PCFG[p.id] = { fee: p.fee, sec: p.sec, comp: p.comp, target: p.target, loss_days: p.loss_days, seed_mode: p.seed_mode };
+    });
 
     const portfoliosFile = await ghGetFile('config/portfolios.json');
     PORTFOLIOS = portfoliosFile.data;
@@ -122,6 +124,26 @@ function renderPortfolio(pf) {
   } else {
     html += `<div class="section-title">오늘 매수 체결 수정</div>`;
     html += `<div class="empty">${s.data.as_of_date || '최근'} 날짜에 새로 매수 체결된 티어가 없습니다.</div>`;
+  }
+
+  const todaySells = (s.data.history || [])
+    .map((h, i) => ({ h, i }))
+    .filter(x => x.h.type === 'sell' && x.h.date === s.data.as_of_date);
+
+  if (todaySells.length) {
+    html += `<div class="section-title">오늘(${s.data.as_of_date}) 매도 체결 수정</div>`;
+    todaySells.forEach(({ h, i }) => {
+      html += `<div class="sub" style="margin-bottom:6px">${h.slot}번 티어 (매수 ${h.buy_price}, ${h.buy_date} 매수)</div>`;
+      html += `<div class="quickfix-row">
+        <label>실제 체결가 <input id="qfs-price-${pf.id}-${i}" type="number" step="0.01" value="${h.price}" /></label>
+        <label>실제 체결 수량 <input id="qfs-qty-${pf.id}-${i}" type="number" step="1" value="${h.qty}" /></label>
+      </div>
+      <div class="save-bar"><button class="save" id="qfs-save-${pf.id}-${i}">이 매도 수정 저장</button></div>`;
+    });
+  } else {
+    html += `<div class="section-title">오늘 매도 체결 수정</div>`;
+    html += `<div class="empty">${s.data.as_of_date || '최근'} 날짜에 새로 매도 체결된 티어가 없습니다.</div>`;
+    html += `<div class="help">매도가 자동 계산과 달리 아예 안 됐어야 하거나 다른 티어가 팔렸어야 한다면, 아래 "고급" 항목에서 포지션을 직접 추가/삭제해주세요.</div>`;
   }
 
   html += `<details class="advanced"><summary>고급: 포지션/현금/대기주문 직접 관리</summary>`;
@@ -184,6 +206,13 @@ function wirePortfolio(pf) {
   if (todayPos) {
     document.getElementById('qf-save-' + id).onclick = () => saveQuickFix(pf, todayPos);
   }
+
+  (s.data.history || []).forEach((h, i) => {
+    if (h.type === 'sell' && h.date === s.data.as_of_date) {
+      const btn = document.getElementById(`qfs-save-${id}-${i}`);
+      if (btn) btn.onclick = () => saveSellFix(pf, i);
+    }
+  });
 
   document.getElementById('cash-' + id).oninput = (e) => { STATE[id].data.cash = Number(e.target.value); };
 
@@ -253,6 +282,57 @@ async function saveQuickFix(pf, pos) {
     toast(err.message, 6000);
     btn.disabled = false;
     btn.textContent = '이 체결 수정 저장';
+  }
+}
+
+async function saveSellFix(pf, histIdx) {
+  const id = pf.id;
+  const btn = document.getElementById(`qfs-save-${id}-${histIdx}`);
+  btn.disabled = true;
+  btn.textContent = '저장 중…';
+  try {
+    const cfg = PCFG[id] || { fee: 0, sec: 0, seed_mode: 'global' };
+    const h = STATE[id].data.history[histIdx];
+    const newPrice = Number(document.getElementById(`qfs-price-${id}-${histIdx}`).value);
+    const newQty = Number(document.getElementById(`qfs-qty-${id}-${histIdx}`).value);
+
+    // back out the original buy-side cost basis from the already-recorded profit,
+    // so we don't need the (already-closed) position's own cost/fee fields.
+    const buyTotal = round2(h.proceeds - h.fee - h.profit);
+
+    const oldNet = round2(h.proceeds - h.fee);
+    const newProceeds = round2(newPrice * newQty);
+    const newFee = round2(newProceeds * (cfg.fee + (cfg.sec || 0)));
+    const newNet = round2(newProceeds - newFee);
+    const newProfit = round2(newProceeds - newFee - buyTotal);
+
+    STATE[id].data.cash = round2(STATE[id].data.cash + newNet - oldNet);
+
+    if (cfg.seed_mode === 'round_lag' && h.buy_round != null) {
+      const rph = STATE[id].data.round_profit_history || {};
+      rph[h.buy_round] = round2((rph[h.buy_round] || 0) + (newProfit - h.profit));
+      STATE[id].data.round_profit_history = rph;
+    } else if (cfg.seed_mode === 'global' && STATE[id].data.compounded_principal != null) {
+      STATE[id].data.compounded_principal = round2(
+        STATE[id].data.compounded_principal + (newProfit - h.profit) * (cfg.comp != null ? cfg.comp : 1)
+      );
+    }
+
+    h.price = newPrice;
+    h.qty = newQty;
+    h.proceeds = newProceeds;
+    h.fee = newFee;
+    h.profit = newProfit;
+    h.profit_pct = h.buy_price ? Math.round((newPrice / h.buy_price - 1) * 1e6) / 1e6 : 0;
+
+    const result = await ghPutFile(STATE[id].stateFile, STATE[id].data, STATE[id].sha, `오늘 매도 정정: ${id} (웹 대시보드)`);
+    STATE[id].sha = result.content.sha;
+    toast('저장 완료 ✅ ' + (pf.short_label || pf.name));
+    render();
+  } catch (err) {
+    toast(err.message, 6000);
+    btn.disabled = false;
+    btn.textContent = '이 매도 수정 저장';
   }
 }
 
