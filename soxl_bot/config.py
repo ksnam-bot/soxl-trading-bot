@@ -66,6 +66,7 @@ class PortfolioConfig:
     state_file: Path
     active: bool = True
     kakao_enabled: bool = True
+    short_label: str = ""  # 카카오 메시지에 쓰는 짧은 이름, 예: "공격형"
 
 
 def load_presets(path: Path) -> dict[str, PresetConfig]:
@@ -87,6 +88,7 @@ def load_portfolios(path: Path, presets: dict[str, PresetConfig], base_dir: Path
                 state_file=base_dir / item["state_file"],
                 active=item.get("active", True),
                 kakao_enabled=item.get("kakao_enabled", True),
+                short_label=item.get("short_label", item["name"]),
             )
         )
     return out

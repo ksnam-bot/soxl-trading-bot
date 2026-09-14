@@ -67,3 +67,40 @@ def build_snapshot(portfolio_summaries: list[dict]) -> dict:
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "portfolios": portfolio_summaries,
     }
+
+
+def config_snapshot(portfolios: list[PortfolioConfig]) -> dict:
+    """Non-sensitive strategy parameters, for the mobile '설정값 보기' page."""
+    out = []
+    for pf in portfolios:
+        cfg = pf.preset
+        out.append(
+            {
+                "id": pf.id,
+                "name": pf.name,
+                "short_label": pf.short_label,
+                "ticker": pf.ticker,
+                "active": pf.active,
+                "kakao_enabled": pf.kakao_enabled,
+                "preset_name": cfg.name,
+                "principal": cfg.principal,
+                "split": cfg.split,
+                "weights": cfg.weights,
+                "odgap": cfg.odgap,
+                "target": cfg.target,
+                "loss_days": cfg.loss_days,
+                "extrange": cfg.extrange,
+                "comp": cfg.comp,
+                "fee": cfg.fee,
+                "sec": cfg.sec,
+                "order_type": cfg.order_type,
+                "odcount": cfg.odcount,
+                "step": cfg.step,
+                "mocbuy": cfg.mocbuy,
+                "seed_mode": cfg.seed_mode,
+            }
+        )
+    return {
+        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "portfolios": out,
+    }

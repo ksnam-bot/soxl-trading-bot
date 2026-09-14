@@ -38,7 +38,7 @@ def refresh_access_token(client_id: str, refresh_token: str, client_secret: str 
 def send_text_to_me(access_token: str, text: str, web_url: str | None = None) -> None:
     template = {
         "object_type": "text",
-        "text": text[:1000],  # Kakao memo API caps text length
+        "text": text[:1900],  # safety net well under Kakao's memo text cap
         "link": {
             "web_url": web_url or "https://finance.yahoo.com/quote/SOXL",
             "mobile_web_url": web_url or "https://finance.yahoo.com/quote/SOXL",

@@ -16,9 +16,9 @@ from pathlib import Path
 from soxl_bot.calendar_utils import next_trading_day
 from soxl_bot.config import load_portfolios, load_presets
 from soxl_bot.engine import process_trading_day
-from soxl_bot.notify import format_portfolio_report
+from soxl_bot.notify import format_combined_message, format_portfolio_report
 from soxl_bot.pricing import fetch_recent_closes
-from soxl_bot.public_summary import build_snapshot, portfolio_summary
+from soxl_bot.public_summary import build_snapshot, config_snapshot, portfolio_summary
 from soxl_bot.state import load_state, save_state
 
 BASE_DIR = Path(__file__).parent
@@ -28,7 +28,7 @@ def run(dry_run: bool = False) -> int:
     presets = load_presets(BASE_DIR / "config" / "presets.json")
     portfolios = load_portfolios(BASE_DIR / "config" / "portfolios.json", presets, BASE_DIR)
 
-    messages: list[str] = []
+    kakao_entries: list[tuple] = []
     public_summaries: list[dict] = []
     had_output = False
 
@@ -61,30 +61,38 @@ def run(dry_run: bool = False) -> int:
 
         had_output = True
         save_state(state, pf.state_file)
-        text = format_portfolio_report(pf, state, last_report)
-        messages.append((pf, text))
-        public_summaries.append(portfolio_summary(pf, state, last_report))
         print("=" * 60)
-        print(text)
+        print(format_portfolio_report(pf, state, last_report))
+        public_summaries.append(portfolio_summary(pf, state, last_report))
+        if pf.kakao_enabled:
+            kakao_entries.append((pf, state, last_report))
+
+    docs_dir = BASE_DIR / "docs"
+    docs_dir.mkdir(exist_ok=True)
 
     if public_summaries:
-        docs_dir = BASE_DIR / "docs"
-        docs_dir.mkdir(exist_ok=True)
         snapshot = build_snapshot(public_summaries)
         (docs_dir / "latest.json").write_text(
             json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
-    if not dry_run:
-        from soxl_bot.kakao import send_daily_notification
+    # Settings rarely change, but keep the mobile "설정값 보기" page in sync every run.
+    (docs_dir / "config.json").write_text(
+        json.dumps(config_snapshot(portfolios), ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
-        for pf, text in messages:
-            if not pf.kakao_enabled:
-                continue
+    if kakao_entries:
+        combined_text = format_combined_message(kakao_entries)
+        print("=" * 60)
+        print("[combined kakao message]")
+        print(combined_text)
+        if not dry_run:
+            from soxl_bot.kakao import send_daily_notification
+
             try:
-                send_daily_notification(text)
+                send_daily_notification(combined_text)
             except Exception as e:  # noqa: BLE001
-                print(f"[{pf.id}] Kakao notification failed: {e}", file=sys.stderr)
+                print(f"Kakao notification failed: {e}", file=sys.stderr)
 
     return 0 if had_output or not portfolios else 0
 

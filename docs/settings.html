@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SOXL 설정값</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SOXL 신호" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header>
+    <h1>설정값</h1>
+    <div class="updated" id="updated">불러오는 중…</div>
+  </header>
+  <nav class="tabs">
+    <a href="./index.html">오늘의 신호</a>
+    <a href="./settings.html" class="active">설정값</a>
+  </nav>
+  <div id="content"></div>
+
+<script>
+async function load() {
+  const content = document.getElementById('content');
+  try {
+    const res = await fetch('./config.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('config.json 없음');
+    const data = await res.json();
+    document.getElementById('updated').textContent =
+      '갱신: ' + new Date(data.generated_at).toLocaleString('ko-KR');
+    content.innerHTML = data.portfolios.map(renderPortfolio).join('');
+  } catch (e) {
+    content.innerHTML = '<div class="card"><div class="err">아직 데이터가 없습니다. GitHub Actions가 처음 실행되면 여기 표시됩니다.</div></div>';
+    document.getElementById('updated').textContent = '';
+  }
+}
+
+function pct(x) {
+  const v = Number(x) * 100;
+  const decimals = Math.abs(v) < 0.01 ? 5 : 2;
+  return v.toFixed(decimals).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') + '%';
+}
+function money(x) { return '$' + Number(x).toLocaleString('en-US'); }
+
+function renderPortfolio(p) {
+  let html = `<div class="card"><h2>${p.name}</h2>`;
+  html += `<div class="sub">${p.ticker} · ${p.preset_name} 프리셋 ${p.active ? '' : '(비활성)'} ${p.kakao_enabled ? '' : '· 알림 꺼짐'}</div>`;
+
+  html += '<div class="section-title">기본값</div>';
+  html += '<div class="kv">';
+  html += pill('초기원금', money(p.principal));
+  html += pill('시드분할', p.split + '개');
+  html += pill('복리율', pct(p.comp));
+  html += pill('매매수수료', pct(p.fee));
+  html += pill('세금(SEC 등)', pct(p.sec));
+  html += pill('추가매수범위', pct(p.extrange));
+  html += pill('주문방식', p.order_type === 'FIXODC' ? '건수 고정' : '수량 고정');
+  html += pill('추가주문건수', p.odcount);
+  if (p.step != null) html += pill('수량스텝', p.step);
+  html += pill('MOC날 매수', p.mocbuy ? 'ON' : 'OFF');
+  html += pill('시드 복리방식', p.seed_mode === 'global' ? '계좌 전체' : '슬롯별');
+  html += '</div>';
+
+  html += '<div class="section-title">티어별 설정</div>';
+  html += '<table class="tiers"><thead><tr><th>티어</th><th>비중</th><th>ODGAP</th><th>목표</th><th>손절일</th></tr></thead><tbody>';
+  for (let i = 0; i < p.split; i++) {
+    html += `<tr><td>${i + 1}번</td><td>${pct(p.weights[i])}</td><td>${pct(p.odgap[i])}</td><td>+${pct(p.target[i])}</td><td>${p.loss_days[i]}영업일</td></tr>`;
+  }
+  html += '</tbody></table>';
+
+  html += '</div>';
+  return html;
+}
+
+function pill(label, value) {
+  return `<div class="pill">${label} <b>${value}</b></div>`;
+}
+
+load();
+</script>
+</body>
+</html>
