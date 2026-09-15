@@ -1,97 +1,21 @@
 {
   "portfolio_id": "maemae_stable",
-  "as_of_date": "2026-09-14",
-  "cash": 14763.01,
-  "total_shares": 15,
-  "open_positions": [
-    {
-      "slot": 1,
-      "buy_date": "2026-09-14",
-      "buy_price": 101.13,
-      "qty": 15,
-      "cost": 1516.95,
-      "buy_fee": 1.52,
-      "target_price": 103.66,
-      "cutoff_date": "2026-09-28",
-      "buy_round": null
-    }
-  ],
+  "as_of_date": "2026-09-08",
+  "cash": 16205.82,
+  "total_shares": 0,
+  "open_positions": [],
   "pending_order": {
-    "slot": 2,
-    "order_price": 101.11,
-    "seed": 2442.2219999999998,
-    "for_date": "2026-09-15"
+    "slot": 1,
+    "order_price": 123.25,
+    "seed": 1620.582,
+    "for_date": "2026-09-09"
   },
-  "compounded_principal": 16281.48,
-  "total_day_index": 4,
-  "round_seed_history": {},
-  "round_profit_history": {},
+  "compounded_principal": 16205.82,
+  "slot_seed": {},
+  "slot_profit": {},
   "history": [
     {
       "note": "2026-09-08 종가 기준으로 사용자의 실제 스프레드시트(4989 매매법)에서 가져온 초기 상태. 이후 기록은 run_daily.py가 자동으로 추가함."
-    },
-    {
-      "date": "2026-09-10",
-      "type": "buy",
-      "slot": 1,
-      "price": 115.76,
-      "qty": 13,
-      "cost": 1504.88,
-      "fee": 1.5
-    },
-    {
-      "date": "2026-09-11",
-      "type": "sell",
-      "slot": 1,
-      "buy_date": "2026-09-10",
-      "buy_price": 115.76,
-      "price": 121.82,
-      "qty": 13,
-      "proceeds": 1583.66,
-      "fee": 1.62,
-      "profit": 75.66,
-      "profit_pct": 0.05235,
-      "reason": "target",
-      "buy_round": null
-    },
-    {
-      "date": "2026-09-14",
-      "type": "buy",
-      "slot": 1,
-      "price": 101.13,
-      "qty": 15,
-      "cost": 1516.95,
-      "fee": 1.52
-    }
-  ],
-  "equity_log": [
-    {
-      "date": "2026-09-09",
-      "cash": 16205.82,
-      "holding_value": 0,
-      "total_value": 16205.82,
-      "return_pct": 0.080388
-    },
-    {
-      "date": "2026-09-10",
-      "cash": 14699.439999999999,
-      "holding_value": 1504.88,
-      "total_value": 16204.32,
-      "return_pct": 0.080288
-    },
-    {
-      "date": "2026-09-11",
-      "cash": 16281.48,
-      "holding_value": 0,
-      "total_value": 16281.48,
-      "return_pct": 0.085432
-    },
-    {
-      "date": "2026-09-14",
-      "cash": 14763.01,
-      "holding_value": 1516.95,
-      "total_value": 16279.96,
-      "return_pct": 0.085331
     }
   ]
 }

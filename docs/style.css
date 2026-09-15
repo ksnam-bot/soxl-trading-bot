@@ -177,6 +177,7 @@ table.tiers td:first-child, table.tiers th:first-child { text-align: left; color
 .ret.pos { color: var(--accent); }
 .ret.neg { color: var(--danger); }
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.totals-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0 20px; }
 .stat-grid .stat-card {
   background: var(--card);
   border: 1px solid var(--border);

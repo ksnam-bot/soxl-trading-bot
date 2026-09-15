@@ -63,12 +63,14 @@ function renderCombined(c, fx) {
     <div class="stat-card">
       <div class="label">보유 주식</div>
       <div class="value">${c.shares.toLocaleString('en-US')}주</div>
+      <div class="value" style="font-size:13px">${fmt(c.holding_value)}</div>
     </div>
     <div class="stat-card">
       <div class="label">현금</div>
       <div class="value">${fmt(c.cash)}</div>
     </div>
   </div>`;
+  html += `<hr class="totals-divider" />`;
   return html;
 }
 
@@ -83,7 +85,7 @@ function renderPortfolio(p) {
     <div class="stat-card">
       <div class="label">${label} 보유 ${p.shares}주</div>
       <div class="value" style="font-size:14px">현금 ${fmt(p.cash)}</div>
-      <div class="value" style="font-size:14px">평가 ${fmt(p.holding_value)}</div>
+      <div class="value" style="font-size:14px">주식평가액 ${fmt(p.holding_value)}</div>
     </div>
   </div>`;
 

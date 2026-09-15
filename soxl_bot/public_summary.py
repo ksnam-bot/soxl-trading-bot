@@ -84,6 +84,7 @@ def portfolio_summary(cfg: PortfolioConfig, state: PortfolioState, report: DayRe
 
 def build_snapshot(portfolio_summaries: list[dict], fx: dict | None = None) -> dict:
     total_cash = sum(p["cash"] for p in portfolio_summaries)
+    total_holding_value = sum(p["holding_value"] for p in portfolio_summaries)
     total_value = sum(p["total_value"] for p in portfolio_summaries)
     total_principal = sum(p["principal"] for p in portfolio_summaries)
     total_shares = sum(p["shares"] for p in portfolio_summaries)
@@ -93,6 +94,7 @@ def build_snapshot(portfolio_summaries: list[dict], fx: dict | None = None) -> d
         "combined": {
             "cash": total_cash,
             "shares": total_shares,
+            "holding_value": total_holding_value,
             "total_value": total_value,
             "principal": total_principal,
             "return_pct": _return_pct(total_value, total_principal),
