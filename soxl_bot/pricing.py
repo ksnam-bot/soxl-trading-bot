@@ -25,3 +25,15 @@ def latest_close(ticker: str) -> tuple[dt.date, float]:
         raise RuntimeError(f"yfinance returned no recent close data for {ticker}")
     last_date = max(closes)
     return last_date, closes[last_date]
+
+
+def fetch_usd_krw() -> dict | None:
+    """USD/KRW, reusing the same Yahoo Finance chart endpoint (ticker KRW=X).
+    Returns None on failure rather than raising — a missing FX rate shouldn't
+    stop the daily trading-signal run.
+    """
+    try:
+        d, rate = latest_close("KRW=X")
+        return {"date": d.isoformat(), "rate": rate}
+    except Exception:  # noqa: BLE001
+        return None

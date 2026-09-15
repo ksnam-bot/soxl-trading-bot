@@ -28,13 +28,14 @@ soxl_bot/            핵심 로직 (엔진, 캘린더, 가격조회, 카카오, 
 config/presets.json  전략 파라미터 (공격형/안정형)
 config/portfolios.json  운용 중인 계좌 목록 (여러 개 추가 가능)
 state/*.json         계좌별 현재 상태 (보유 티어, 현금, 시드) — 매일 자동 갱신+커밋 (비공개 정보 포함)
-docs/latest.json     모바일 대시보드용 요약 (현금·총자산·수익률 포함) — 매일 자동 갱신
+docs/latest.json     모바일 대시보드용 요약 (현금·보유주식·총자산·수익률·환율 포함) — 매일 자동 갱신
 docs/config.json     모바일 대시보드용 전략 설정 스냅샷 — 매일 자동 갱신
 docs/history.json    모바일 대시보드용 매수/매도 체결 이력 — 매일 자동 갱신
+docs/equity.json     모바일 대시보드용 일별 총자산/수익률 흐름 — 매일 자동 갱신
 docs/index.html      오늘의 신호 (메인 화면, GitHub Pages로 서빙, 홈화면에 추가해서 앱처럼 사용)
 docs/settings.html   설정값 보기/편집 (보조 메뉴)
 docs/positions.html  오늘 체결 수정 + (고급) 포지션/현금/대기주문 직접 관리 (보조 메뉴)
-docs/history.html    매수/매도 체결 이력 (보조 메뉴)
+docs/history.html    매수/매도 체결 이력 + 수익률 흐름 그래프 (보조 메뉴)
 docs/gh-common.js    settings.html·positions.html이 함께 쓰는 GitHub API 연동 코드
 run_daily.py          매일 실행되는 진입점
 .github/workflows/daily.yml   GitHub Actions 스케줄
@@ -116,8 +117,17 @@ run_daily.py          매일 실행되는 진입점
 씁니다. 설정값 편집과 같은 GitHub 개인 액세스 토큰을 그대로 씁니다. 저장하면
 `state/<계좌id>.json`이 바로 갱신되고, 다음 자동 실행부터 이 값을 기준으로 계산됩니다.
 
-> 참고: "거래 이력"(`docs/history.html`) 탭은 이 기능들을 만든 시점부터의 체결만 기록합니다 —
-> 그 이전 과거 거래는 개별 기록으로 복원되지 않고, 현재 잔고/수익률에만 이미 반영돼 있습니다.
+> 참고: "거래 이력"(`docs/history.html`) 탭과 그 안의 "수익률 흐름" 그래프는 그 기능을 만든
+> 시점부터 쌓인 것만 보여줍니다 — 그 이전 과거는 개별 기록으로 복원되지 않고, 현재 잔고/수익률에만
+> 이미 반영돼 있습니다.
+
+## 대시보드에 표시되는 추가 정보
+
+- **오늘의 신호 상단**: 합산/계좌별 보유 주식 수, 현금, 원화 환산 금액(환율 포함)을 보여줍니다.
+  환율은 Yahoo Finance의 `KRW=X` 티커를 종가 조회와 같은 방식으로 매일 같이 가져옵니다 — 별도
+  서비스 연동 없음.
+- **거래 이력 상단**: 계좌별 + 합산 누적 수익률을 선 그래프로 보여줍니다. 매일 실행될 때마다
+  그날의 총자산/수익률을 `state/*.json`의 `equity_log`에 한 줄씩 기록해서 그립니다.
 
 **설정 방법**
 1. 저장소가 아직 Private이면 **Settings > General > Danger Zone > Change visibility > Public**

@@ -19,6 +19,7 @@ def _return_pct(total_value: float, principal: float) -> float:
 
 
 def portfolio_summary(cfg: PortfolioConfig, state: PortfolioState, report: DayReport) -> dict:
+    shares = sum(p.qty for p in state.open_positions)
     holding_value = sum(p.qty * report.close for p in state.open_positions)
     total_value = state.cash + holding_value
     principal = cfg.preset.principal
@@ -29,6 +30,7 @@ def portfolio_summary(cfg: PortfolioConfig, state: PortfolioState, report: DayRe
         "short_label": cfg.short_label,
         "trading_date": report.trading_date.isoformat(),
         "close": report.close,
+        "shares": shares,
         "cash": state.cash,
         "holding_value": holding_value,
         "total_value": total_value,
@@ -80,19 +82,57 @@ def portfolio_summary(cfg: PortfolioConfig, state: PortfolioState, report: DayRe
     }
 
 
-def build_snapshot(portfolio_summaries: list[dict]) -> dict:
+def build_snapshot(portfolio_summaries: list[dict], fx: dict | None = None) -> dict:
     total_cash = sum(p["cash"] for p in portfolio_summaries)
     total_value = sum(p["total_value"] for p in portfolio_summaries)
     total_principal = sum(p["principal"] for p in portfolio_summaries)
+    total_shares = sum(p["shares"] for p in portfolio_summaries)
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "fx_usdkrw": fx,
         "combined": {
             "cash": total_cash,
+            "shares": total_shares,
             "total_value": total_value,
             "principal": total_principal,
             "return_pct": _return_pct(total_value, total_principal),
         },
         "portfolios": portfolio_summaries,
+    }
+
+
+def equity_snapshot(portfolio_states: list[tuple[PortfolioConfig, PortfolioState]]) -> dict:
+    """일별 총자산/수익률 흐름 — 거래 이력 페이지의 그래프용. 계좌별 시리즈 + 날짜별 합산 시리즈."""
+    series = {}
+    for pf, state in portfolio_states:
+        label = pf.short_label or pf.name
+        series[pf.id] = {
+            "label": label,
+            "principal": pf.preset.principal,
+            "points": [
+                {"date": e["date"], "total_value": e["total_value"], "return_pct": e["return_pct"]}
+                for e in state.equity_log
+            ],
+        }
+
+    by_date: dict[str, float] = {}
+    principal_sum = sum(pf.preset.principal for pf, _ in portfolio_states)
+    for pid, s in series.items():
+        for pt in s["points"]:
+            by_date[pt["date"]] = by_date.get(pt["date"], 0.0) + pt["total_value"]
+    combined_points = [
+        {
+            "date": d,
+            "total_value": round(v, 2),
+            "return_pct": round((v - principal_sum) / principal_sum, 6) if principal_sum > 0 else 0.0,
+        }
+        for d, v in sorted(by_date.items())
+    ]
+
+    return {
+        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "combined": {"principal": principal_sum, "points": combined_points},
+        "portfolios": series,
     }
 
 

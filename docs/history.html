@@ -21,6 +21,10 @@
     font-size: 13px;
     margin-bottom: 14px;
   }
+  .chart-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .chart-legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+  svg.equity-chart { display: block; width: 100%; height: auto; }
+  svg.equity-chart text { font-family: inherit; fill: var(--muted); }
 </style>
 </head>
 <body>
@@ -34,6 +38,7 @@
     <a href="./positions.html">포지션 수정</a>
     <a href="./history.html" class="active">거래 이력</a>
   </nav>
+  <div id="chartCard"></div>
   <select id="portfolioFilter"><option value="">전체 계좌</option></select>
   <div id="content"></div>
 
@@ -65,6 +70,74 @@ async function load() {
     content.innerHTML = `<div class="card"><div class="err">아직 거래 이력이 없습니다. 매수/매도가 처음 체결되면 여기 쌓입니다.</div></div>`;
     document.getElementById('updated').textContent = '';
   }
+  loadChart();
+}
+
+async function loadChart() {
+  const chartCard = document.getElementById('chartCard');
+  try {
+    const res = await fetch('./equity.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('no equity.json');
+    const data = await res.json();
+    const series = [
+      { key: 'combined', label: '합산', points: (data.combined && data.combined.points) || [], color: 'var(--text)', width: 2.4 },
+      ...Object.entries(data.portfolios || {}).map(([id, s], i) => ({
+        key: id, label: s.label, points: s.points || [],
+        color: i === 0 ? 'var(--accent)' : 'var(--sell)', width: 1.6,
+      })),
+    ].filter(s => s.points.length > 0);
+
+    if (!series.length || series.every(s => s.points.length < 2)) {
+      chartCard.innerHTML = '<div class="card"><div class="section-title">수익률 흐름</div><div class="empty">아직 그래프를 그릴 만큼 날짜가 쌓이지 않았습니다. 며칠 뒤부터 보입니다.</div></div>';
+      return;
+    }
+    chartCard.innerHTML = `<div class="card"><div class="section-title">수익률 흐름</div>${renderEquityChart(series)}</div>`;
+  } catch (e) {
+    chartCard.innerHTML = '';
+  }
+}
+
+function renderEquityChart(series) {
+  const W = 700, H = 240, padL = 44, padR = 12, padT = 14, padB = 26;
+  const allDates = [...new Set(series.flatMap(s => s.points.map(p => p.date)))].sort();
+  const allPct = series.flatMap(s => s.points.map(p => p.return_pct));
+  let yMin = Math.min(0, ...allPct), yMax = Math.max(0, ...allPct);
+  if (yMin === yMax) { yMin -= 0.01; yMax += 0.01; }
+  const yPad = (yMax - yMin) * 0.12;
+  yMin -= yPad; yMax += yPad;
+
+  const x = (date) => padL + (allDates.indexOf(date) / Math.max(1, allDates.length - 1)) * (W - padL - padR);
+  const y = (v) => padT + (1 - (v - yMin) / (yMax - yMin)) * (H - padT - padB);
+
+  let svg = `<svg class="equity-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="계좌별 누적 수익률 추이 그래프">`;
+
+  // three evenly-spaced gridlines (top/mid/bottom of the visible range)
+  const gridVals = [yMax - yPad * 0.4, (yMin + yMax) / 2, yMin + yPad * 0.4];
+  for (const gv of gridVals) {
+    const gy = y(gv);
+    svg += `<line x1="${padL}" y1="${gy}" x2="${W - padR}" y2="${gy}" stroke="var(--border)" stroke-width="1" />`;
+    svg += `<text x="${padL - 6}" y="${gy + 3}" font-size="10" text-anchor="end">${(gv * 100).toFixed(1)}%</text>`;
+  }
+
+  // x-axis: first and last date only, to keep it readable
+  svg += `<text x="${padL}" y="${H - 6}" font-size="10" text-anchor="start">${allDates[0]}</text>`;
+  svg += `<text x="${W - padR}" y="${H - 6}" font-size="10" text-anchor="end">${allDates[allDates.length - 1]}</text>`;
+
+  for (const s of series) {
+    if (s.points.length < 2) continue;
+    const d = s.points.map(p => `${x(p.date)},${y(p.return_pct)}`).join(' L ');
+    svg += `<path d="M ${d}" fill="none" stroke="${s.color}" stroke-width="${s.width}" stroke-linecap="round" stroke-linejoin="round" />`;
+    const last = s.points[s.points.length - 1];
+    svg += `<circle cx="${x(last.date)}" cy="${y(last.return_pct)}" r="3" fill="${s.color}" />`;
+  }
+
+  svg += `</svg>`;
+
+  const legend = series.map(s =>
+    `<span><span class="dot" style="background:${s.color}"></span>${s.label} ${(s.points[s.points.length - 1].return_pct * 100).toFixed(2)}%</span>`
+  ).join('');
+
+  return svg + `<div class="chart-legend">${legend}</div>`;
 }
 
 function fmt2(n) { return '$' + Number(n).toFixed(2); }

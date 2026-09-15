@@ -336,6 +336,20 @@ def process_trading_day(
 
     # --- Step 3: figure out tomorrow's order for the next free slot ---
     state.as_of_date = trading_date
+
+    holding_value = round(sum(p.qty * close_price for p in state.open_positions), 2)
+    total_value = round(state.cash + holding_value, 2)
+    return_pct = (total_value - cfg.principal) / cfg.principal if cfg.principal > 0 else 0.0
+    state.equity_log.append(
+        {
+            "date": trading_date.isoformat(),
+            "cash": state.cash,
+            "holding_value": holding_value,
+            "total_value": total_value,
+            "return_pct": round(return_pct, 6),
+        }
+    )
+
     next_date = next_trading_day(trading_date)
     active_slot = len(state.open_positions) + 1
 

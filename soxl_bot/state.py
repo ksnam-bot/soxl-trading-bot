@@ -76,7 +76,8 @@ class PortfolioState:
     total_day_index: int = 0
     round_seed_history: dict[int, float] = field(default_factory=dict)
     round_profit_history: dict[int, float] = field(default_factory=dict)
-    history: list[dict] = field(default_factory=list)  # append-only daily log for auditing
+    history: list[dict] = field(default_factory=list)  # append-only trade (buy/sell) log
+    equity_log: list[dict] = field(default_factory=list)  # append-only daily {date,total_value,return_pct} log
 
     def to_json(self) -> dict:
         return {
@@ -91,6 +92,7 @@ class PortfolioState:
             "round_seed_history": {str(k): v for k, v in self.round_seed_history.items()},
             "round_profit_history": {str(k): v for k, v in self.round_profit_history.items()},
             "history": self.history,
+            "equity_log": self.equity_log,
         }
 
     @classmethod
@@ -107,6 +109,7 @@ class PortfolioState:
             round_seed_history={int(k): v for k, v in d.get("round_seed_history", {}).items()},
             round_profit_history={int(k): v for k, v in d.get("round_profit_history", {}).items()},
             history=d.get("history", []),
+            equity_log=d.get("equity_log", []),
         )
 
 

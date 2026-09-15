@@ -17,8 +17,14 @@ from soxl_bot.calendar_utils import next_trading_day
 from soxl_bot.config import load_portfolios, load_presets
 from soxl_bot.engine import current_status_report, process_trading_day
 from soxl_bot.notify import format_combined_message, format_portfolio_report
-from soxl_bot.pricing import fetch_recent_closes
-from soxl_bot.public_summary import build_snapshot, config_snapshot, history_snapshot, portfolio_summary
+from soxl_bot.pricing import fetch_recent_closes, fetch_usd_krw
+from soxl_bot.public_summary import (
+    build_snapshot,
+    config_snapshot,
+    equity_snapshot,
+    history_snapshot,
+    portfolio_summary,
+)
 from soxl_bot.state import load_state, save_state
 
 BASE_DIR = Path(__file__).parent
@@ -76,7 +82,8 @@ def run(dry_run: bool = False) -> int:
     docs_dir.mkdir(exist_ok=True)
 
     if public_summaries:
-        snapshot = build_snapshot(public_summaries)
+        fx = fetch_usd_krw()
+        snapshot = build_snapshot(public_summaries, fx=fx)
         (docs_dir / "latest.json").write_text(
             json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8"
         )
@@ -88,6 +95,10 @@ def run(dry_run: bool = False) -> int:
 
     (docs_dir / "history.json").write_text(
         json.dumps(history_snapshot(history_states), ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+    (docs_dir / "equity.json").write_text(
+        json.dumps(equity_snapshot(history_states), ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
     if kakao_entries:
