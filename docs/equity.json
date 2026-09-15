@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-09-15T08:06:52.612126+00:00",
+  "combined": {
+    "principal": 30000.0,
+    "points": [
+      {
+        "date": "2026-09-09",
+        "total_value": 16205.82,
+        "return_pct": -0.459806
+      },
+      {
+        "date": "2026-09-10",
+        "total_value": 16204.32,
+        "return_pct": -0.459856
+      },
+      {
+        "date": "2026-09-11",
+        "total_value": 16281.48,
+        "return_pct": -0.457284
+      },
+      {
+        "date": "2026-09-14",
+        "total_value": 32663.41,
+        "return_pct": 0.08878
+      }
+    ]
+  },
+  "portfolios": {
+    "jong_aggressive": {
+      "label": "공격형",
+      "principal": 15000.0,
+      "points": [
+        {
+          "date": "2026-09-14",
+          "total_value": 16383.45,
+          "return_pct": 0.09223
+        }
+      ]
+    },
+    "maemae_stable": {
+      "label": "안정형",
+      "principal": 15000.0,
+      "points": [
+        {
+          "date": "2026-09-09",
+          "total_value": 16205.82,
+          "return_pct": 0.080388
+        },
+        {
+          "date": "2026-09-10",
+          "total_value": 16204.32,
+          "return_pct": 0.080288
+        },
+        {
+          "date": "2026-09-11",
+          "total_value": 16281.48,
+          "return_pct": 0.085432
+        },
+        {
+          "date": "2026-09-14",
+          "total_value": 16279.96,
+          "return_pct": 0.085331
+        }
+      ]
+    }
+  }
+}
