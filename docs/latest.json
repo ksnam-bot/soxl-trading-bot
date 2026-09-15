@@ -1,12 +1,13 @@
 {
-  "generated_at": "2026-09-15T08:06:52.611478+00:00",
+  "generated_at": "2026-09-15T08:24:28.514806+00:00",
   "fx_usdkrw": {
     "date": "2026-09-15",
-    "rate": 1361.28
+    "rate": 1361.38
   },
   "combined": {
     "cash": 24573.01,
     "shares": 80,
+    "holding_value": 8090.4,
     "total_value": 32663.409999999996,
     "principal": 30000.0,
     "return_pct": 0.08878033333333321
