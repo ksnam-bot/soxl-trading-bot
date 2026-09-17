@@ -1,6 +1,23 @@
 {
-  "generated_at": "2026-09-16T22:35:47.600185+00:00",
+  "generated_at": "2026-09-17T22:33:00.531963+00:00",
   "entries": [
+    {
+      "date": "2026-09-17",
+      "type": "sell",
+      "slot": 4,
+      "buy_date": "2026-09-15",
+      "buy_price": 102.32,
+      "price": 114.82,
+      "qty": 26,
+      "proceeds": 2985.32,
+      "fee": 3.05,
+      "profit": 319.29,
+      "profit_pct": 0.122166,
+      "reason": "target",
+      "buy_round": 12,
+      "portfolio_id": "jong_aggressive",
+      "portfolio_label": "공격형"
+    },
     {
       "date": "2026-09-16",
       "type": "sell",
