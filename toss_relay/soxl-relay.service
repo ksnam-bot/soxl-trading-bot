@@ -1,0 +1,15 @@
+[Unit]
+Description=SOXL Toss relay (read-only holdings)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/soxl-relay
+EnvironmentFile=/home/ubuntu/soxl-relay/.env
+ExecStart=/home/ubuntu/soxl-relay/venv/bin/uvicorn server:app --host 127.0.0.1 --port 8901
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
