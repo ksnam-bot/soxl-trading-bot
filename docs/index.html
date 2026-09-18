@@ -232,8 +232,6 @@ async function loadTossCard() {
   }
 }
 
-const MATCH_OK_STATUSES = new Set(['PENDING', 'PARTIAL_FILLED', 'FILLED', 'PENDING_CANCEL', 'PENDING_REPLACE']);
-
 function matchOrdersWithSignal(realOrders) {
   document.querySelectorAll('.order-line[data-side]').forEach((el) => {
     const badges = el.querySelector('.badges');
@@ -244,18 +242,22 @@ function matchOrdersWithSignal(realOrders) {
     const side = el.dataset.side;
     const price = Number(el.dataset.price);
     const qty = Number(el.dataset.qty);
-    const match = realOrders.find((o) =>
-      o.side === side &&
-      Number(o.quantity) === qty &&
-      o.price != null &&
-      Math.abs(Number(o.price) - price) < 0.005
-    );
+    const sameSide = realOrders.filter((o) => o.side === side);
+    const priceOk = (o) => o.price != null && Math.abs(Number(o.price) - price) < 0.005;
+    const qtyOk = (o) => Number(o.quantity) === qty;
+
+    const exact = sameSide.find((o) => priceOk(o) && qtyOk(o));
+    // same side + only price or only quantity matches → possible typo, flag for review
+    const near = !exact && sameSide.find((o) => priceOk(o) || qtyOk(o));
 
     const badge = document.createElement('span');
     badge.className = 'match-badge';
-    if (match) {
-      badge.classList.add(MATCH_OK_STATUSES.has(match.status) ? 'match-ok' : 'match-warn');
-      badge.textContent = '✅ ' + (ORDER_STATUS_LABEL[match.status] || match.status);
+    if (exact) {
+      badge.classList.add('match-ok');
+      badge.textContent = '✅ 주문 완료';
+    } else if (near) {
+      badge.classList.add('match-warn');
+      badge.textContent = '⚠️ 확인요망';
     } else {
       badge.classList.add('match-pending');
       badge.textContent = '⏳ 미주문';
