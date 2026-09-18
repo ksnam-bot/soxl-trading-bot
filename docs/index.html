@@ -21,6 +21,7 @@
     <a href="./history.html">거래 이력</a>
   </nav>
   <div id="content"></div>
+  <div id="tossCard"></div>
 
 <script>
 async function load() {
@@ -135,6 +136,97 @@ function renderPortfolio(p) {
 }
 
 load();
+
+// --- 실제 토스증권 계좌 (읽기 전용, 별도 relay 서버 필요: toss_relay/README.md 참고) ---
+const LS_TOSS_URL = 'soxl_toss_relay_url', LS_TOSS_SECRET = 'soxl_toss_relay_secret';
+
+function tossCreds() {
+  return {
+    url: (localStorage.getItem(LS_TOSS_URL) || '').replace(/\/$/, ''),
+    secret: localStorage.getItem(LS_TOSS_SECRET) || '',
+  };
+}
+
+async function loadTossCard() {
+  const el = document.getElementById('tossCard');
+  const { url, secret } = tossCreds();
+
+  if (!url || !secret) {
+    el.innerHTML = `<div class="card">
+      <h2>실제 토스증권 계좌</h2>
+      <div class="sub">읽기 전용 · SOXL 보유 현황</div>
+      <div class="help" style="margin-bottom:10px">토스 연동 relay 서버 주소와 비밀값을 입력하면 실제 계좌의 SOXL 보유 현황을 봅니다. 서버가 아직 없다면 <code>toss_relay/README.md</code> 참고.</div>
+      <form class="setup-form" id="tossSetupForm">
+        <input name="url" placeholder="relay 주소 (예: https://내도메인.duckdns.org)" required />
+        <input name="secret" type="password" placeholder="RELAY_SHARED_SECRET 값" required />
+        <button type="submit">연결하기</button>
+      </form>
+    </div>`;
+    document.getElementById('tossSetupForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = e.target;
+      localStorage.setItem(LS_TOSS_URL, f.url.value.trim());
+      localStorage.setItem(LS_TOSS_SECRET, f.secret.value.trim());
+      loadTossCard();
+    });
+    return;
+  }
+
+  el.innerHTML = '<div class="card"><h2>실제 토스증권 계좌</h2><div class="empty">불러오는 중…</div></div>';
+  try {
+    const res = await fetch(`${url}/toss/holdings?symbol=SOXL`, {
+      headers: { Authorization: `Bearer ${secret}` },
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error(`relay 응답 오류 (${res.status})`);
+    const data = await res.json();
+    const item = (data.items || [])[0];
+
+    let html = `<div class="card"><button class="edit-toggle" id="tossDisconnect">연결 해제</button><h2>실제 토스증권 계좌</h2><div class="sub">읽기 전용 · SOXL 보유 현황</div>`;
+    if (!item) {
+      html += '<div class="empty">토스 계좌에 SOXL 보유 내역이 없습니다.</div>';
+    } else {
+      html += `<div class="stat-grid">
+        <div class="stat-card">
+          <div class="label">보유 수량</div>
+          <div class="value">${Number(item.quantity).toLocaleString('en-US')}주</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">평가금액</div>
+          <div class="value">${fmt2(item.marketValue.amount)}</div>
+        </div>
+      </div>`;
+      html += `<div class="kv">
+        ${pill('매입평균가', fmt2(item.averagePurchasePrice))}
+        ${pill('현재가', fmt2(item.lastPrice))}
+        ${pill('매입금액', fmt2(item.marketValue.purchaseAmount))}
+      </div>`;
+      const profitClass = item.profitLoss.amount >= 0 ? 'ret pos' : 'ret neg';
+      html += `<div class="${profitClass}" style="margin-top:10px">손익 ${item.profitLoss.amount >= 0 ? '+' : ''}${fmt2(item.profitLoss.amount)} (${pct(item.profitLoss.rate)})</div>`;
+    }
+    html += '</div>';
+    el.innerHTML = html;
+    document.getElementById('tossDisconnect').onclick = () => {
+      localStorage.removeItem(LS_TOSS_URL);
+      localStorage.removeItem(LS_TOSS_SECRET);
+      loadTossCard();
+    };
+  } catch (e) {
+    el.innerHTML = `<div class="card"><h2>실제 토스증권 계좌</h2><div class="err">${e.message}</div>
+      <button class="edit-toggle" id="tossDisconnect2">연결 정보 다시 입력</button></div>`;
+    document.getElementById('tossDisconnect2').onclick = () => {
+      localStorage.removeItem(LS_TOSS_URL);
+      localStorage.removeItem(LS_TOSS_SECRET);
+      loadTossCard();
+    };
+  }
+}
+
+function pill(label, value) {
+  return `<div class="pill">${label} <b>${value}</b></div>`;
+}
+
+loadTossCard();
 </script>
 </body>
 </html>
