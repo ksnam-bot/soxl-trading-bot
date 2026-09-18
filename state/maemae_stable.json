@@ -1,17 +1,17 @@
 {
   "portfolio_id": "maemae_stable",
-  "as_of_date": "2026-09-17",
+  "as_of_date": "2026-09-18",
   "cash": 16320.970000000001,
   "total_shares": 0,
   "open_positions": [],
   "pending_order": {
     "slot": 1,
-    "order_price": 114.8,
+    "order_price": 123.65,
     "seed": 1632.097,
-    "for_date": "2026-09-18"
+    "for_date": "2026-09-21"
   },
   "compounded_principal": 16320.97,
-  "total_day_index": 7,
+  "total_day_index": 8,
   "round_seed_history": {},
   "round_profit_history": {},
   "history": [
@@ -112,6 +112,13 @@
     },
     {
       "date": "2026-09-17",
+      "cash": 16320.970000000001,
+      "holding_value": 0,
+      "total_value": 16320.97,
+      "return_pct": 0.088065
+    },
+    {
+      "date": "2026-09-18",
       "cash": 16320.970000000001,
       "holding_value": 0,
       "total_value": 16320.97,
