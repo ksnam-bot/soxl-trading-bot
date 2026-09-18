@@ -224,6 +224,7 @@ table.tiers td:first-child, table.tiers th:first-child { text-align: left; color
 .order-line + .order-line { margin-top: 4px; }
 .order-line.buy { background: var(--buy-bg); color: var(--buy); }
 .order-line.sell { background: var(--sell-bg); color: var(--sell); }
+.order-line .badges { display: flex; align-items: center; gap: 6px; }
 .order-line .slot-badge {
   font-size: 11px;
   font-weight: 600;
@@ -231,8 +232,17 @@ table.tiers td:first-child, table.tiers th:first-child { text-align: left; color
   background: var(--bg);
   border-radius: 999px;
   padding: 2px 8px;
-  margin-left: 8px;
 }
+.match-badge {
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.match-badge.match-ok { background: var(--accent-bg); color: var(--accent); }
+.match-badge.match-warn { background: var(--warn-bg); color: var(--warn); }
+.match-badge.match-pending { background: var(--bg); color: var(--muted); }
 .fill-line { padding: 8px 10px; border-radius: 10px; font-size: 14px; }
 .fill-line.buy { background: var(--buy-bg); }
 .fill-line.sell { background: var(--sell-bg); }

@@ -38,6 +38,7 @@ async function load() {
       '갱신: ' + new Date(data.generated_at).toLocaleString('ko-KR');
     content.innerHTML = renderCombined(data.combined, data.fx_usdkrw) +
       data.portfolios.map(renderPortfolio).join('');
+    matchOrdersWithSignal(window.__realOrders || []);
   } catch (e) {
     content.innerHTML = '<div class="card"><div class="err">아직 데이터가 없습니다. GitHub Actions가 처음 실행되면 여기 표시됩니다.</div></div>';
     document.getElementById('updated').textContent = '';
@@ -120,7 +121,7 @@ function renderPortfolio(p) {
     html += '<div class="empty">신규 매수 없음 (전 티어 보유 중)</div>';
   } else if (p.pending_order && p.pending_order.ladder.length) {
     for (const l of p.pending_order.ladder) {
-      html += `<div class="order-line buy"><span>${fmt2(l.price)} × ${l.qty}주</span><span class="slot-badge">${p.pending_order.slot}번</span></div>`;
+      html += `<div class="order-line buy" data-side="BUY" data-price="${l.price}" data-qty="${l.qty}"><span>${fmt2(l.price)} × ${l.qty}주</span><span class="badges"><span class="slot-badge">${p.pending_order.slot}번</span></span></div>`;
     }
   } else {
     html += '<div class="empty">신규 매수 주문 없음</div>';
@@ -129,7 +130,7 @@ function renderPortfolio(p) {
   html += '<div class="section-title">오늘 매도 주문</div>';
   if (p.open_positions.length) {
     for (const o of p.open_positions) {
-      html += `<div class="order-line sell"><span>${fmt2(o.target_price)} × ${o.qty}주</span><span class="slot-badge">${o.slot}번</span></div>`;
+      html += `<div class="order-line sell" data-side="SELL" data-price="${o.target_price}" data-qty="${o.qty}"><span>${fmt2(o.target_price)} × ${o.qty}주</span><span class="badges"><span class="slot-badge">${o.slot}번</span></span></div>`;
     }
   } else {
     html += '<div class="empty">매도 주문 없음 (보유 티어 없음)</div>';
@@ -231,6 +232,38 @@ async function loadTossCard() {
   }
 }
 
+const MATCH_OK_STATUSES = new Set(['PENDING', 'PARTIAL_FILLED', 'FILLED', 'PENDING_CANCEL', 'PENDING_REPLACE']);
+
+function matchOrdersWithSignal(realOrders) {
+  document.querySelectorAll('.order-line[data-side]').forEach((el) => {
+    const badges = el.querySelector('.badges');
+    if (!badges) return;
+    const old = badges.querySelector('.match-badge');
+    if (old) old.remove();
+
+    const side = el.dataset.side;
+    const price = Number(el.dataset.price);
+    const qty = Number(el.dataset.qty);
+    const match = realOrders.find((o) =>
+      o.side === side &&
+      Number(o.quantity) === qty &&
+      o.price != null &&
+      Math.abs(Number(o.price) - price) < 0.005
+    );
+
+    const badge = document.createElement('span');
+    badge.className = 'match-badge';
+    if (match) {
+      badge.classList.add(MATCH_OK_STATUSES.has(match.status) ? 'match-ok' : 'match-warn');
+      badge.textContent = '✅ ' + (ORDER_STATUS_LABEL[match.status] || match.status);
+    } else {
+      badge.classList.add('match-pending');
+      badge.textContent = '⏳ 미주문';
+    }
+    badges.appendChild(badge);
+  });
+}
+
 const ORDER_STATUS_LABEL = {
   PENDING: '체결대기', PENDING_CANCEL: '취소대기', PENDING_REPLACE: '정정대기',
   PARTIAL_FILLED: '부분체결', FILLED: '체결완료', CANCELED: '취소됨',
@@ -266,6 +299,8 @@ async function loadTossOrders() {
     if (!res.ok) throw new Error(`relay 응답 오류 (${res.status})`);
     const data = await res.json();
     const orders = data.orders || [];
+    window.__realOrders = orders;
+    matchOrdersWithSignal(orders);
 
     let html = `<div class="card"><h2>오늘 주문 내역</h2><div class="sub">${data.date} · SOXL</div>`;
     if (!orders.length) {
