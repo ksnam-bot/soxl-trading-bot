@@ -12,8 +12,11 @@
 </head>
 <body>
   <header>
-    <h1>오늘의 트레이딩 (SOXL)</h1>
-    <div class="updated" id="updated">불러오는 중…</div>
+    <div>
+      <h1>오늘의 트레이딩 (SOXL)</h1>
+      <div class="updated" id="updated">불러오는 중…</div>
+    </div>
+    <button class="refresh-btn" id="refreshBtn" aria-label="새로고침">⟳</button>
   </header>
   <nav class="secondary-tabs">
     <a href="./settings.html">설정값</a>
@@ -22,6 +25,7 @@
   </nav>
   <div id="content"></div>
   <div id="tossCard"></div>
+  <div id="tossOrdersCard"></div>
 
 <script>
 async function load() {
@@ -168,7 +172,9 @@ async function loadTossCard() {
       localStorage.setItem(LS_TOSS_URL, f.url.value.trim());
       localStorage.setItem(LS_TOSS_SECRET, f.secret.value.trim());
       loadTossCard();
+      loadTossOrders();
     });
+    document.getElementById('tossOrdersCard').innerHTML = '';
     return;
   }
 
@@ -210,7 +216,9 @@ async function loadTossCard() {
       localStorage.removeItem(LS_TOSS_URL);
       localStorage.removeItem(LS_TOSS_SECRET);
       loadTossCard();
+      document.getElementById('tossOrdersCard').innerHTML = '';
     };
+    loadTossOrders();
   } catch (e) {
     el.innerHTML = `<div class="card"><h2>실제 토스증권 계좌</h2><div class="err">${e.message}</div>
       <button class="edit-toggle" id="tossDisconnect2">연결 정보 다시 입력</button></div>`;
@@ -218,7 +226,57 @@ async function loadTossCard() {
       localStorage.removeItem(LS_TOSS_URL);
       localStorage.removeItem(LS_TOSS_SECRET);
       loadTossCard();
+      document.getElementById('tossOrdersCard').innerHTML = '';
     };
+  }
+}
+
+const ORDER_STATUS_LABEL = {
+  PENDING: '체결대기', PENDING_CANCEL: '취소대기', PENDING_REPLACE: '정정대기',
+  PARTIAL_FILLED: '부분체결', FILLED: '체결완료', CANCELED: '취소됨',
+  REJECTED: '거부됨', CANCEL_REJECTED: '취소거부', REPLACE_REJECTED: '정정거부', REPLACED: '정정됨',
+};
+
+function renderOrderLine(o) {
+  const sideLabel = o.side === 'BUY' ? '매수' : '매도';
+  const sideClass = o.side === 'BUY' ? 'buy' : 'sell';
+  const statusLabel = ORDER_STATUS_LABEL[o.status] || o.status;
+  const priceTxt = o.price != null ? fmt2(o.price) : '시장가';
+  let detail = `${priceTxt} × ${o.quantity}주`;
+  const filledQty = Number((o.execution && o.execution.filledQuantity) || 0);
+  if (filledQty > 0) {
+    const avgPrice = o.execution.averageFilledPrice != null ? fmt2(o.execution.averageFilledPrice) : '-';
+    detail += ` · 체결 ${filledQty}주 @ ${avgPrice}`;
+  }
+  const time = o.orderedAt ? new Date(o.orderedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '';
+  return `<div class="fill-line ${sideClass}"><div class="headline">${sideLabel} · ${statusLabel} · ${o.quantity}주</div><div class="detail">${detail}${time ? ' · ' + time : ''}</div></div>`;
+}
+
+async function loadTossOrders() {
+  const el = document.getElementById('tossOrdersCard');
+  const { url, secret } = tossCreds();
+  if (!url || !secret) { el.innerHTML = ''; return; }
+
+  el.innerHTML = '<div class="card"><h2>오늘 주문 내역</h2><div class="empty">불러오는 중…</div></div>';
+  try {
+    const res = await fetch(`${url}/toss/orders?symbol=SOXL`, {
+      headers: { Authorization: `Bearer ${secret}` },
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error(`relay 응답 오류 (${res.status})`);
+    const data = await res.json();
+    const orders = data.orders || [];
+
+    let html = `<div class="card"><h2>오늘 주문 내역</h2><div class="sub">${data.date} · SOXL</div>`;
+    if (!orders.length) {
+      html += '<div class="empty">오늘 넣은 주문이 없습니다.</div>';
+    } else {
+      html += orders.map(renderOrderLine).join('');
+    }
+    html += '</div>';
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = `<div class="card"><h2>오늘 주문 내역</h2><div class="err">${e.message}</div></div>`;
   }
 }
 
@@ -227,6 +285,16 @@ function pill(label, value) {
 }
 
 loadTossCard();
+loadTossOrders();
+
+document.getElementById('refreshBtn').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  await Promise.all([load(), loadTossCard(), loadTossOrders()]);
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+});
 </script>
 </body>
 </html>

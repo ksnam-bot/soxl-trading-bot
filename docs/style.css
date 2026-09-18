@@ -12,6 +12,8 @@
   --warn-bg: #fffbeb;
   --sell: #2563eb;
   --sell-bg: #eff6ff;
+  --buy: #dc2626;
+  --buy-bg: #fef2f2;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -29,6 +31,8 @@
     --warn-bg: #2e2410;
     --sell: #60a5fa;
     --sell-bg: #0b2447;
+    --buy: #f87171;
+    --buy-bg: #2e1213;
   }
 }
 :root[data-theme="dark"] {
@@ -45,6 +49,8 @@
   --warn-bg: #2e2410;
   --sell: #60a5fa;
   --sell-bg: #0b2447;
+  --buy: #f87171;
+  --buy-bg: #2e1213;
 }
 * { box-sizing: border-box; }
 body {
@@ -56,9 +62,24 @@ body {
   max-width: 560px;
   margin-inline: auto;
 }
-header { margin-bottom: 18px; }
+header { margin-bottom: 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 h1 { font-size: 22px; margin: 0 0 4px; }
 .updated { color: var(--muted); font-size: 12px; }
+.refresh-btn {
+  flex-shrink: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  margin-top: 2px;
+}
+.refresh-btn.spinning { animation: refresh-spin .6s linear; }
+@keyframes refresh-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* primary nav: the one screen people open every day */
 a.primary-tab {
@@ -201,7 +222,7 @@ table.tiers td:first-child, table.tiers th:first-child { text-align: left; color
   font-variant-numeric: tabular-nums;
 }
 .order-line + .order-line { margin-top: 4px; }
-.order-line.buy { background: var(--accent-bg); color: var(--accent); }
+.order-line.buy { background: var(--buy-bg); color: var(--buy); }
 .order-line.sell { background: var(--sell-bg); color: var(--sell); }
 .order-line .slot-badge {
   font-size: 11px;
@@ -213,7 +234,7 @@ table.tiers td:first-child, table.tiers th:first-child { text-align: left; color
   margin-left: 8px;
 }
 .fill-line { padding: 8px 10px; border-radius: 10px; font-size: 14px; }
-.fill-line.buy { background: var(--accent-bg); }
+.fill-line.buy { background: var(--buy-bg); }
 .fill-line.sell { background: var(--sell-bg); }
 .fill-line .headline { font-weight: 700; }
 .fill-line .detail { color: var(--muted); font-size: 12px; margin-top: 2px; }
