@@ -1,6 +1,17 @@
 {
-  "generated_at": "2026-09-21T22:35:55.590679+00:00",
+  "generated_at": "2026-09-22T22:34:52.344279+00:00",
   "entries": [
+    {
+      "date": "2026-09-22",
+      "type": "buy",
+      "slot": 1,
+      "price": 151.95,
+      "qty": 18,
+      "cost": 2735.1,
+      "fee": 2.74,
+      "portfolio_id": "jong_aggressive",
+      "portfolio_label": "공격형"
+    },
     {
       "date": "2026-09-21",
       "type": "sell",
