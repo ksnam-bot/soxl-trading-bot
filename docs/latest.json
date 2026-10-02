@@ -1,79 +1,70 @@
 {
-  "generated_at": "2026-10-01T22:37:50.591646+00:00",
+  "generated_at": "2026-10-02T22:38:01.845044+00:00",
   "fx_usdkrw": {
-    "date": "2026-10-01",
-    "rate": 1360.5699
+    "date": "2026-10-02",
+    "rate": 1342.51
   },
   "combined": {
-    "cash": 32828.28,
-    "shares": 18,
-    "holding_value": 2766.42,
-    "total_value": 35594.7,
+    "cash": 35772.05,
+    "shares": 0,
+    "holding_value": 0,
+    "total_value": 35772.05,
     "principal": 30000.0,
-    "return_pct": 0.1864899999999999
+    "return_pct": 0.19240166666666678
   },
   "portfolios": [
     {
       "id": "jong_aggressive",
       "name": "종사종팔 V4 (공격형)",
       "short_label": "공격형",
-      "trading_date": "2026-10-01",
-      "close": 153.69,
-      "shares": 18,
-      "cash": 16404.83,
-      "holding_value": 2766.42,
-      "total_value": 19171.25,
+      "trading_date": "2026-10-02",
+      "close": 163.71,
+      "shares": 0,
+      "cash": 19348.600000000002,
+      "holding_value": 0,
+      "total_value": 19348.600000000002,
       "principal": 15000.0,
-      "return_pct": 0.27808333333333335,
+      "return_pct": 0.2899066666666668,
       "filled_buy": null,
-      "unfilled_buy_price": 151.85000000000002,
+      "unfilled_buy_price": 156.05,
       "sells": [
         {
-          "slot": 2,
-          "sell_price": 153.69,
+          "slot": 1,
+          "sell_price": 163.71,
           "qty": 18,
           "reason": "target",
-          "buy_price": 147.86,
-          "profit": 99.46,
-          "profit_pct": 0.039429189774110585
+          "buy_price": 151.95,
+          "profit": 205.93,
+          "profit_pct": 0.0773938795656468
         }
       ],
       "no_open_slot_today": false,
       "pending_order": {
-        "slot": 2,
-        "for_date": "2026-10-02",
+        "slot": 1,
+        "for_date": "2026-10-05",
         "ladder": [
           {
-            "price": 156.05,
-            "qty": 19
+            "price": 180.08,
+            "qty": 16
           },
           {
-            "price": 143.11,
+            "price": 166.96,
             "qty": 2
           },
           {
-            "price": 130.67,
+            "price": 150.27,
             "qty": 2
           }
         ]
       },
-      "open_positions": [
-        {
-          "slot": 1,
-          "buy_date": "2026-09-22",
-          "buy_price": 151.95,
-          "qty": 18,
-          "target_price": 156.06,
-          "cutoff_date": "2026-10-06"
-        }
-      ]
+      "open_positions": []
     },
     {
       "id": "maemae_stable",
       "name": "4989 매매법 (안정형)",
       "short_label": "안정형",
-      "trading_date": "2026-10-01",
-      "close": 153.69,
+      "trading_date": "2026-10-02",
+      "close": 163.71,
       "shares": 0,
       "cash": 16423.45,
       "holding_value": 0,
@@ -81,15 +72,15 @@
       "principal": 15000.0,
       "return_pct": 0.09489666666666671,
       "filled_buy": null,
-      "unfilled_buy_price": 147.84,
+      "unfilled_buy_price": 153.67,
       "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 1,
-        "for_date": "2026-10-02",
+        "for_date": "2026-10-05",
         "ladder": [
           {
-            "price": 153.67,
+            "price": 163.69,
             "qty": 10
           },
           {
