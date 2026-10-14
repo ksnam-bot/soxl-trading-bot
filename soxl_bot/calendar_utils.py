@@ -71,6 +71,16 @@ def nyse_holidays(year: int) -> frozenset[dt.date]:
     return frozenset(holidays)
 
 
+def _us_dst(d: dt.date) -> bool:
+    """US daylight saving time: 2nd Sunday of March up to the 1st Sunday of November."""
+    return _nth_weekday(d.year, 3, 6, 2) <= d < _nth_weekday(d.year, 11, 6, 1)
+
+
+def market_close_utc(d: dt.date) -> dt.datetime:
+    """16:00 New York time on trading date d, as an aware UTC datetime."""
+    return dt.datetime(d.year, d.month, d.day, 16 + (4 if _us_dst(d) else 5), 0, tzinfo=dt.timezone.utc)
+
+
 def is_trading_day(d: dt.date) -> bool:
     if d.weekday() >= 5:
         return False
