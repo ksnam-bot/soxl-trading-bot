@@ -30,6 +30,20 @@ from soxl_bot.state import load_state, save_state
 BASE_DIR = Path(__file__).parent
 
 
+def write_json_if_changed(path: Path, payload: dict, ignore: tuple[str, ...] = ("generated_at",)) -> None:
+    """Skip the write when only volatile keys differ, so retry runs don't create empty commits."""
+    if path.exists():
+        try:
+            old = json.loads(path.read_text(encoding="utf-8"))
+        except ValueError:
+            old = None
+        if isinstance(old, dict):
+            strip = lambda d: {k: v for k, v in d.items() if k not in ignore}  # noqa: E731
+            if strip(old) == strip(payload):
+                return
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def run(dry_run: bool = False) -> int:
     presets = load_presets(BASE_DIR / "config" / "presets.json")
     portfolios = load_portfolios(BASE_DIR / "config" / "portfolios.json", presets, BASE_DIR)
@@ -38,6 +52,7 @@ def run(dry_run: bool = False) -> int:
     public_summaries: list[dict] = []
     history_states: list[tuple] = []
     had_output = False
+    processed_new_day = False
 
     for pf in portfolios:
         if not pf.active:
@@ -65,6 +80,7 @@ def run(dry_run: bool = False) -> int:
 
         if last_report is not None:
             had_output = True
+            processed_new_day = True
             save_state(state, pf.state_file)
             display_report = last_report
         else:
@@ -84,24 +100,16 @@ def run(dry_run: bool = False) -> int:
     if public_summaries:
         fx = fetch_usd_krw()
         snapshot = build_snapshot(public_summaries, fx=fx)
-        (docs_dir / "latest.json").write_text(
-            json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
+        write_json_if_changed(docs_dir / "latest.json", snapshot, ignore=("generated_at", "fx_usdkrw"))
 
     # Settings rarely change, but keep the mobile "설정값 보기" page in sync every run.
-    (docs_dir / "config.json").write_text(
-        json.dumps(config_snapshot(portfolios), ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    write_json_if_changed(docs_dir / "config.json", config_snapshot(portfolios))
+    write_json_if_changed(docs_dir / "history.json", history_snapshot(history_states))
+    write_json_if_changed(docs_dir / "equity.json", equity_snapshot(history_states))
 
-    (docs_dir / "history.json").write_text(
-        json.dumps(history_snapshot(history_states), ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-
-    (docs_dir / "equity.json").write_text(
-        json.dumps(equity_snapshot(history_states), ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-
-    if kakao_entries:
+    if kakao_entries and not processed_new_day:
+        print("no new trading day processed this run — skipping KakaoTalk (already sent when the day was processed)")
+    elif kakao_entries:
         combined_text = format_combined_message(kakao_entries)
         print("=" * 60)
         print("[combined kakao message]")
