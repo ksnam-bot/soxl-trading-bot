@@ -1,8 +1,8 @@
 {
   "portfolio_id": "maemae_stable",
-  "as_of_date": "2026-10-12",
-  "cash": 5976.599999999999,
-  "total_shares": 75,
+  "as_of_date": "2026-10-13",
+  "cash": 3550.3499999999995,
+  "total_shares": 94,
   "open_positions": [
     {
       "slot": 1,
@@ -47,16 +47,27 @@
       "target_price": 131.61,
       "cutoff_date": "2026-10-26",
       "buy_round": null
+    },
+    {
+      "slot": 5,
+      "buy_date": "2026-10-13",
+      "buy_price": 127.57,
+      "qty": 19,
+      "cost": 2423.83,
+      "buy_fee": 2.42,
+      "target_price": 130.76,
+      "cutoff_date": "2026-10-27",
+      "buy_round": null
     }
   ],
   "pending_order": {
-    "slot": 5,
-    "order_price": 128.38,
-    "seed": 2463.5174999999995,
-    "for_date": "2026-10-13"
+    "slot": 6,
+    "order_price": 127.55,
+    "seed": 1642.3449999999998,
+    "for_date": "2026-10-14"
   },
   "compounded_principal": 16423.449999999997,
-  "total_day_index": 24,
+  "total_day_index": 25,
   "round_seed_history": {},
   "round_profit_history": {},
   "history": [
@@ -194,6 +205,15 @@
       "qty": 25,
       "cost": 3210.0,
       "fee": 3.21
+    },
+    {
+      "date": "2026-10-13",
+      "type": "buy",
+      "slot": 5,
+      "price": 127.57,
+      "qty": 19,
+      "cost": 2423.83,
+      "fee": 2.42
     }
   ],
   "equity_log": [
@@ -364,6 +384,13 @@
       "holding_value": 9630.0,
       "total_value": 15606.6,
       "return_pct": 0.04044
+    },
+    {
+      "date": "2026-10-13",
+      "cash": 3550.3499999999995,
+      "holding_value": 11991.58,
+      "total_value": 15541.93,
+      "return_pct": 0.036129
     }
   ]
 }

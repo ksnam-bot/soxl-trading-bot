@@ -1,6 +1,28 @@
 {
-  "generated_at": "2026-10-13T03:05:34.113681+00:00",
+  "generated_at": "2026-10-14T07:31:55.277847+00:00",
   "entries": [
+    {
+      "date": "2026-10-13",
+      "type": "buy",
+      "slot": 5,
+      "price": 127.57,
+      "qty": 19,
+      "cost": 2423.83,
+      "fee": 2.42,
+      "portfolio_id": "maemae_stable",
+      "portfolio_label": "안정형"
+    },
+    {
+      "date": "2026-10-13",
+      "type": "buy",
+      "slot": 7,
+      "price": 127.57,
+      "qty": 17,
+      "cost": 2168.69,
+      "fee": 2.17,
+      "portfolio_id": "jong_aggressive",
+      "portfolio_label": "공격형"
+    },
     {
       "date": "2026-10-12",
       "type": "buy",
