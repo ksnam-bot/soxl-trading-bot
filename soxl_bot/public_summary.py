@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import datetime as dt
 
+from .calendar_utils import market_close_utc, next_trading_day
 from .config import PortfolioConfig
 from .engine import DayReport
 from .state import PortfolioState
@@ -88,8 +89,14 @@ def build_snapshot(portfolio_summaries: list[dict], fx: dict | None = None) -> d
     total_value = sum(p["total_value"] for p in portfolio_summaries)
     total_principal = sum(p["principal"] for p in portfolio_summaries)
     total_shares = sum(p["shares"] for p in portfolio_summaries)
+    next_expected = None
+    if portfolio_summaries:
+        latest = dt.date.fromisoformat(max(p["trading_date"] for p in portfolio_summaries))
+        nxt = next_trading_day(latest)
+        next_expected = {"date": nxt.isoformat(), "utc": market_close_utc(nxt).isoformat()}
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "next_expected_close": next_expected,
         "fx_usdkrw": fx,
         "combined": {
             "cash": total_cash,
