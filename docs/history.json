@@ -1,6 +1,17 @@
 {
-  "generated_at": "2026-10-14T07:31:55.277847+00:00",
+  "generated_at": "2026-10-15T00:39:17.954139+00:00",
   "entries": [
+    {
+      "date": "2026-10-14",
+      "type": "buy",
+      "slot": 6,
+      "price": 110.54,
+      "qty": 14,
+      "cost": 1547.56,
+      "fee": 1.55,
+      "portfolio_id": "maemae_stable",
+      "portfolio_label": "안정형"
+    },
     {
       "date": "2026-10-13",
       "type": "buy",

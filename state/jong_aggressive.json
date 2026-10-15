@@ -1,6 +1,6 @@
 {
   "portfolio_id": "jong_aggressive",
-  "as_of_date": "2026-10-13",
+  "as_of_date": "2026-10-14",
   "cash": 111.14000000000351,
   "total_shares": 132,
   "open_positions": [
@@ -84,7 +84,7 @@
   ],
   "pending_order": null,
   "compounded_principal": null,
-  "total_day_index": 100,
+  "total_day_index": 101,
   "round_seed_history": {
     "11": 2653.635714,
     "12": 2721.771428285714,
@@ -542,6 +542,13 @@
       "holding_value": 16839.24,
       "total_value": 16950.38,
       "return_pct": 0.130025
+    },
+    {
+      "date": "2026-10-14",
+      "cash": 111.14000000000351,
+      "holding_value": 14591.28,
+      "total_value": 14702.42,
+      "return_pct": -0.019839
     }
   ]
 }
