@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-15T00:39:17.953325+00:00",
+  "generated_at": "2026-10-15T01:40:02.144299+00:00",
   "next_expected_close": {
     "date": "2026-10-15",
     "utc": "2026-10-15T20:00:00+00:00"
   },
   "fx_usdkrw": {
     "date": "2026-10-15",
-    "rate": 1346.74
+    "rate": 1351.38
   },
   "combined": {
     "cash": 2112.380000000003,
@@ -105,11 +105,7 @@
       "total_value": 13939.56,
       "principal": 15000.0,
       "return_pct": -0.07069600000000004,
-      "filled_buy": {
-        "slot": 6,
-        "buy_price": 110.54,
-        "qty": 14
-      },
+      "filled_buy": null,
       "unfilled_buy_price": null,
       "sells": [],
       "no_open_slot_today": false,
