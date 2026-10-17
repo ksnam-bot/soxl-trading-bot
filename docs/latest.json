@@ -1,34 +1,34 @@
 {
-  "generated_at": "2026-10-16T04:49:19.497126+00:00",
+  "generated_at": "2026-10-17T04:49:29.727670+00:00",
   "next_expected_close": {
-    "date": "2026-10-16",
-    "utc": "2026-10-16T20:00:00+00:00"
+    "date": "2026-10-19",
+    "utc": "2026-10-19T20:00:00+00:00"
   },
   "fx_usdkrw": {
-    "date": "2026-10-16",
-    "rate": 1342.98
+    "date": "2026-10-17",
+    "rate": 1329.6
   },
   "combined": {
     "cash": 607.980000000003,
     "shares": 254,
-    "holding_value": 27266.899999999998,
-    "total_value": 27874.88,
+    "holding_value": 23792.18,
+    "total_value": 24400.160000000003,
     "principal": 30000.0,
-    "return_pct": -0.0708373333333333
+    "return_pct": -0.1866613333333332
   },
   "portfolios": [
     {
       "id": "jong_aggressive",
       "name": "종사종팔 V4 (공격형)",
       "short_label": "공격형",
-      "trading_date": "2026-10-15",
-      "close": 107.35,
+      "trading_date": "2026-10-16",
+      "close": 93.67,
       "shares": 132,
       "cash": 111.14000000000351,
-      "holding_value": 14170.199999999999,
-      "total_value": 14281.340000000002,
+      "holding_value": 12364.44,
+      "total_value": 12475.580000000004,
       "principal": 15000.0,
-      "return_pct": -0.04791066666666654,
+      "return_pct": -0.16829466666666643,
       "filled_buy": null,
       "unfilled_buy_price": null,
       "sells": [],
@@ -97,14 +97,14 @@
       "id": "maemae_stable",
       "name": "4989 매매법 (안정형)",
       "short_label": "안정형",
-      "trading_date": "2026-10-15",
-      "close": 107.35,
+      "trading_date": "2026-10-16",
+      "close": 93.67,
       "shares": 122,
       "cash": 496.83999999999946,
-      "holding_value": 13096.699999999999,
-      "total_value": 13593.539999999999,
+      "holding_value": 11427.74,
+      "total_value": 11924.58,
       "principal": 15000.0,
-      "return_pct": -0.09376400000000007,
+      "return_pct": -0.20502800000000002,
       "filled_buy": null,
       "unfilled_buy_price": null,
       "sells": [],
