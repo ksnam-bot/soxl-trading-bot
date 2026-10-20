@@ -1,6 +1,23 @@
 {
-  "generated_at": "2026-10-16T01:34:39.853764+00:00",
+  "generated_at": "2026-10-20T01:59:43.790130+00:00",
   "entries": [
+    {
+      "date": "2026-10-19",
+      "type": "sell",
+      "slot": 1,
+      "buy_date": "2026-10-05",
+      "buy_price": 164.27,
+      "price": 98.65,
+      "qty": 18,
+      "proceeds": 1775.7,
+      "fee": 1.81,
+      "profit": -1185.93,
+      "profit_pct": -0.399464,
+      "reason": "loss_cut",
+      "buy_round": 14,
+      "portfolio_id": "jong_aggressive",
+      "portfolio_label": "공격형"
+    },
     {
       "date": "2026-10-15",
       "type": "buy",
