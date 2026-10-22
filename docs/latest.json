@@ -1,57 +1,76 @@
 {
-  "generated_at": "2026-10-21T05:08:36.780805+00:00",
+  "generated_at": "2026-10-22T01:41:52.078316+00:00",
   "next_expected_close": {
-    "date": "2026-10-21",
-    "utc": "2026-10-21T20:00:00+00:00"
+    "date": "2026-10-22",
+    "utc": "2026-10-22T20:00:00+00:00"
   },
   "fx_usdkrw": {
-    "date": "2026-10-21",
-    "rate": 1323.98
+    "date": "2026-10-22",
+    "rate": 1327.1801
   },
   "combined": {
-    "cash": 2378.520000000003,
-    "shares": 236,
-    "holding_value": 23021.800000000003,
-    "total_value": 25400.320000000007,
+    "cash": 6916.4500000000035,
+    "shares": 192,
+    "holding_value": 19822.079999999998,
+    "total_value": 26738.530000000002,
     "principal": 30000.0,
-    "return_pct": -0.15332266666666644
+    "return_pct": -0.10871566666666659
   },
   "portfolios": [
     {
       "id": "jong_aggressive",
       "name": "종사종팔 V4 (공격형)",
       "short_label": "공격형",
-      "trading_date": "2026-10-20",
-      "close": 97.55,
-      "shares": 114,
-      "cash": 1881.6800000000035,
-      "holding_value": 11120.7,
-      "total_value": 13002.380000000005,
+      "trading_date": "2026-10-21",
+      "close": 103.24,
+      "shares": 80,
+      "cash": 5388.260000000004,
+      "holding_value": 8259.199999999999,
+      "total_value": 13647.460000000003,
       "principal": 15000.0,
-      "return_pct": -0.13317466666666636,
+      "return_pct": -0.09016933333333314,
       "filled_buy": null,
-      "unfilled_buy_price": null,
-      "sells": [],
+      "unfilled_buy_price": 100.17999999999999,
+      "sells": [
+        {
+          "slot": 3,
+          "sell_price": 103.24,
+          "qty": 17,
+          "reason": "loss_cut",
+          "buy_price": 158.91,
+          "profit": -950.88,
+          "profit_pct": -0.3503240828141716
+        },
+        {
+          "slot": 7,
+          "sell_price": 103.24,
+          "qty": 17,
+          "reason": "target",
+          "buy_price": 97.55,
+          "profit": 93.28,
+          "profit_pct": 0.058329062019477185
+        }
+      ],
       "no_open_slot_today": false,
       "pending_order": {
-        "slot": 7,
-        "for_date": "2026-10-21",
+        "slot": 5,
+        "for_date": "2026-10-22",
         "ladder": [
           {
-            "price": 100.17999999999999,
-            "qty": 18
+            "price": 113.56,
+            "qty": 27
+          },
+          {
+            "price": 102.91,
+            "qty": 3
+          },
+          {
+            "price": 93.55,
+            "qty": 3
           }
         ]
       },
       "open_positions": [
-        {
-          "slot": 3,
-          "buy_date": "2026-10-07",
-          "buy_price": 158.91,
-          "qty": 17,
-          "target_price": 163.21,
-          "cutoff_date": "2026-10-21"
-        },
         {
           "slot": 4,
           "buy_date": "2026-10-08",
@@ -83,14 +102,6 @@
           "qty": 17,
           "target_price": 131.02,
           "cutoff_date": "2026-10-27"
-        },
-        {
-          "slot": 7,
-          "buy_date": "2026-10-20",
-          "buy_price": 97.55,
-          "qty": 17,
-          "target_price": 100.19,
-          "cutoff_date": "2026-11-03"
         }
       ]
     },
@@ -98,28 +109,39 @@
       "id": "maemae_stable",
       "name": "4989 매매법 (안정형)",
       "short_label": "안정형",
-      "trading_date": "2026-10-20",
-      "close": 97.55,
-      "shares": 122,
-      "cash": 496.83999999999946,
-      "holding_value": 11901.1,
-      "total_value": 12397.94,
+      "trading_date": "2026-10-21",
+      "close": 103.24,
+      "shares": 112,
+      "cash": 1528.1899999999996,
+      "holding_value": 11562.88,
+      "total_value": 13091.07,
       "principal": 15000.0,
-      "return_pct": -0.17347066666666663,
+      "return_pct": -0.12726200000000001,
       "filled_buy": null,
       "unfilled_buy_price": null,
-      "sells": [],
-      "no_open_slot_today": true,
-      "pending_order": null,
-      "open_positions": [
+      "sells": [
         {
           "slot": 1,
-          "buy_date": "2026-10-07",
-          "buy_price": 158.91,
+          "sell_price": 103.24,
           "qty": 10,
-          "target_price": 162.89,
-          "cutoff_date": "2026-10-21"
-        },
+          "reason": "loss_cut",
+          "buy_price": 158.91,
+          "profit": -559.34,
+          "profit_pct": -0.3503240828141716
+        }
+      ],
+      "no_open_slot_today": false,
+      "pending_order": {
+        "slot": 7,
+        "for_date": "2026-10-22",
+        "ladder": [
+          {
+            "price": 103.22,
+            "qty": 14
+          }
+        ]
+      },
+      "open_positions": [
         {
           "slot": 2,
           "buy_date": "2026-10-08",
