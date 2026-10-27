@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-27T01:32:55.573676+00:00",
+  "generated_at": "2026-10-27T02:18:03.651341+00:00",
   "next_expected_close": {
     "date": "2026-10-27",
     "utc": "2026-10-27T20:00:00+00:00"
   },
   "fx_usdkrw": {
     "date": "2026-10-27",
-    "rate": 1324.28
+    "rate": 1323.14
   },
   "combined": {
     "cash": 18510.030000000002,
@@ -30,36 +30,8 @@
       "principal": 15000.0,
       "return_pct": -0.14461599999999974,
       "filled_buy": null,
-      "unfilled_buy_price": 84.32,
-      "sells": [
-        {
-          "slot": 6,
-          "sell_price": 90.5,
-          "qty": 23,
-          "reason": "loss_cut",
-          "buy_price": 128.4,
-          "profit": -876.77,
-          "profit_pct": -0.295171339563863
-        },
-        {
-          "slot": 5,
-          "sell_price": 90.5,
-          "qty": 33,
-          "reason": "target",
-          "buy_price": 82.11,
-          "profit": 271.11,
-          "profit_pct": 0.10218000243575687
-        },
-        {
-          "slot": 5,
-          "sell_price": 90.5,
-          "qty": 36,
-          "reason": "target",
-          "buy_price": 83.56,
-          "profit": 243.5,
-          "profit_pct": 0.08305409286740062
-        }
-      ],
+      "unfilled_buy_price": null,
+      "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 2,
@@ -103,27 +75,8 @@
       "principal": 15000.0,
       "return_pct": -0.23524866666666663,
       "filled_buy": null,
-      "unfilled_buy_price": 83.55,
-      "sells": [
-        {
-          "slot": 4,
-          "sell_price": 90.5,
-          "qty": 25,
-          "reason": "loss_cut",
-          "buy_price": 128.4,
-          "profit": -953.02,
-          "profit_pct": -0.295171339563863
-        },
-        {
-          "slot": 7,
-          "sell_price": 90.5,
-          "qty": 14,
-          "reason": "target",
-          "buy_price": 82.11,
-          "profit": 115.02,
-          "profit_pct": 0.10218000243575687
-        }
-      ],
+      "unfilled_buy_price": null,
+      "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 4,
