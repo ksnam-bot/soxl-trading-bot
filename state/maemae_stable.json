@@ -1,20 +1,9 @@
 {
   "portfolio_id": "maemae_stable",
-  "as_of_date": "2026-10-23",
-  "cash": 3691.8699999999994,
-  "total_shares": 86,
+  "as_of_date": "2026-10-26",
+  "cash": 7217.7699999999995,
+  "total_shares": 47,
   "open_positions": [
-    {
-      "slot": 4,
-      "buy_date": "2026-10-12",
-      "buy_price": 128.4,
-      "qty": 25,
-      "cost": 3210.0,
-      "buy_fee": 3.21,
-      "target_price": 131.61,
-      "cutoff_date": "2026-10-26",
-      "buy_round": null
-    },
     {
       "slot": 5,
       "buy_date": "2026-10-13",
@@ -47,27 +36,16 @@
       "target_price": 110.04,
       "cutoff_date": "2026-10-29",
       "buy_round": null
-    },
-    {
-      "slot": 7,
-      "buy_date": "2026-10-22",
-      "buy_price": 82.11,
-      "qty": 14,
-      "cost": 1149.54,
-      "buy_fee": 1.15,
-      "target_price": 84.17,
-      "cutoff_date": "2026-11-05",
-      "buy_round": null
     }
   ],
   "pending_order": {
-    "slot": 6,
-    "order_price": 83.55,
-    "seed": 1353.5529999999999,
-    "for_date": "2026-10-26"
+    "slot": 4,
+    "order_price": 90.49,
+    "seed": 2539.5059999999994,
+    "for_date": "2026-10-27"
   },
-  "compounded_principal": 13535.529999999997,
-  "total_day_index": 33,
+  "compounded_principal": 12697.529999999997,
+  "total_day_index": 34,
   "round_seed_history": {},
   "round_profit_history": {},
   "history": [
@@ -285,6 +263,36 @@
       "profit": -1297.77,
       "profit_pct": -0.402118,
       "reason": "loss_cut",
+      "buy_round": null
+    },
+    {
+      "date": "2026-10-26",
+      "type": "sell",
+      "slot": 4,
+      "buy_date": "2026-10-12",
+      "buy_price": 128.4,
+      "price": 90.5,
+      "qty": 25,
+      "proceeds": 2262.5,
+      "fee": 2.31,
+      "profit": -953.02,
+      "profit_pct": -0.295171,
+      "reason": "loss_cut",
+      "buy_round": null
+    },
+    {
+      "date": "2026-10-26",
+      "type": "sell",
+      "slot": 7,
+      "buy_date": "2026-10-22",
+      "buy_price": 82.11,
+      "price": 90.5,
+      "qty": 14,
+      "proceeds": 1267.0,
+      "fee": 1.29,
+      "profit": 115.02,
+      "profit_pct": 0.10218,
+      "reason": "target",
       "buy_round": null
     }
   ],
@@ -519,6 +527,13 @@
       "holding_value": 7186.16,
       "total_value": 10878.03,
       "return_pct": -0.274798
+    },
+    {
+      "date": "2026-10-26",
+      "cash": 7217.7699999999995,
+      "holding_value": 4253.5,
+      "total_value": 11471.27,
+      "return_pct": -0.235249
     }
   ]
 }
