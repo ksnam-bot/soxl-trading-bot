@@ -1,29 +1,29 @@
 {
   "portfolio_id": "maemae_stable",
-  "as_of_date": "2026-10-28",
-  "cash": 10637.7,
-  "total_shares": 14,
+  "as_of_date": "2026-10-29",
+  "cash": 10429.82,
+  "total_shares": 16,
   "open_positions": [
     {
-      "slot": 7,
-      "buy_date": "2026-10-15",
-      "buy_price": 107.35,
-      "qty": 14,
-      "cost": 1502.9,
-      "buy_fee": 1.5,
-      "target_price": 110.04,
-      "cutoff_date": "2026-10-29",
+      "slot": 2,
+      "buy_date": "2026-10-29",
+      "buy_price": 102.39,
+      "qty": 16,
+      "cost": 1638.24,
+      "buy_fee": 1.64,
+      "target_price": 104.95,
+      "cutoff_date": "2026-11-12",
       "buy_round": null
     }
   ],
   "pending_order": {
     "slot": 2,
-    "order_price": 107.33,
-    "seed": 1821.3149999999994,
-    "for_date": "2026-10-29"
+    "order_price": 102.37,
+    "seed": 1810.4549999999995,
+    "for_date": "2026-10-30"
   },
-  "compounded_principal": 12142.099999999997,
-  "total_day_index": 36,
+  "compounded_principal": 12069.699999999997,
+  "total_day_index": 37,
   "round_seed_history": {},
   "round_profit_history": {},
   "history": [
@@ -302,6 +302,30 @@
       "profit_pct": -0.028858,
       "reason": "loss_cut",
       "buy_round": null
+    },
+    {
+      "date": "2026-10-29",
+      "type": "buy",
+      "slot": 2,
+      "price": 102.39,
+      "qty": 16,
+      "cost": 1638.24,
+      "fee": 1.64
+    },
+    {
+      "date": "2026-10-29",
+      "type": "sell",
+      "slot": 7,
+      "buy_date": "2026-10-15",
+      "buy_price": 107.35,
+      "price": 102.39,
+      "qty": 14,
+      "proceeds": 1433.46,
+      "fee": 1.46,
+      "profit": -72.4,
+      "profit_pct": -0.046204,
+      "reason": "loss_cut",
+      "buy_round": null
     }
   ],
   "equity_log": [
@@ -556,6 +580,13 @@
       "holding_value": 1502.9,
       "total_value": 12140.6,
       "return_pct": -0.190627
+    },
+    {
+      "date": "2026-10-29",
+      "cash": 10429.82,
+      "holding_value": 1638.24,
+      "total_value": 12068.06,
+      "return_pct": -0.195463
     }
   ]
 }
