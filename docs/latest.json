@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-31T01:41:57.007991+00:00",
+  "generated_at": "2026-10-31T02:38:18.305721+00:00",
   "next_expected_close": {
     "date": "2026-11-02",
     "utc": "2026-11-02T21:00:00+00:00"
@@ -29,11 +29,7 @@
       "total_value": 11472.780000000004,
       "principal": 15000.0,
       "return_pct": -0.23514799999999972,
-      "filled_buy": {
-        "slot": 3,
-        "buy_price": 77.05,
-        "qty": 35
-      },
+      "filled_buy": null,
       "unfilled_buy_price": null,
       "sells": [],
       "no_open_slot_today": false,
@@ -94,11 +90,7 @@
       "total_value": 11661.0,
       "principal": 15000.0,
       "return_pct": -0.2226,
-      "filled_buy": {
-        "slot": 2,
-        "buy_price": 77.05,
-        "qty": 21
-      },
+      "filled_buy": null,
       "unfilled_buy_price": null,
       "sells": [],
       "no_open_slot_today": false,
