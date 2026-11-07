@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-07T02:05:41.562800+00:00",
+  "generated_at": "2026-11-07T03:02:02.077450+00:00",
   "next_expected_close": {
     "date": "2026-11-09",
     "utc": "2026-11-09T21:00:00+00:00"
@@ -30,18 +30,8 @@
       "principal": 15000.0,
       "return_pct": -0.4563806666666664,
       "filled_buy": null,
-      "unfilled_buy_price": 41.97,
-      "sells": [
-        {
-          "slot": 5,
-          "sell_price": 45.97,
-          "qty": 33,
-          "reason": "target",
-          "buy_price": 40.87,
-          "profit": 165.4,
-          "profit_pct": 0.12478590653290933
-        }
-      ],
+      "unfilled_buy_price": null,
+      "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 5,
@@ -109,18 +99,8 @@
       "principal": 15000.0,
       "return_pct": -0.31937399999999994,
       "filled_buy": null,
-      "unfilled_buy_price": 40.86,
-      "sells": [
-        {
-          "slot": 4,
-          "sell_price": 45.97,
-          "qty": 44,
-          "reason": "target",
-          "buy_price": 40.87,
-          "profit": 220.54,
-          "profit_pct": 0.12478590653290933
-        }
-      ],
+      "unfilled_buy_price": null,
+      "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 4,
