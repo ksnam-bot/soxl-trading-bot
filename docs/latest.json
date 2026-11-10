@@ -1,53 +1,53 @@
 {
-  "generated_at": "2026-11-07T03:02:02.077450+00:00",
+  "generated_at": "2026-11-10T04:12:46.325749+00:00",
   "next_expected_close": {
-    "date": "2026-11-09",
-    "utc": "2026-11-09T21:00:00+00:00"
+    "date": "2026-11-10",
+    "utc": "2026-11-10T21:00:00+00:00"
   },
   "fx_usdkrw": {
-    "date": "2026-11-06",
-    "rate": 1356.34
+    "date": "2026-11-10",
+    "rate": 1344.41
   },
   "combined": {
     "cash": 9031.770000000006,
     "shares": 203,
-    "holding_value": 9331.91,
-    "total_value": 18363.680000000008,
+    "holding_value": 11408.6,
+    "total_value": 20440.370000000006,
     "principal": 30000.0,
-    "return_pct": -0.3878773333333331
+    "return_pct": -0.31865433333333315
   },
   "portfolios": [
     {
       "id": "jong_aggressive",
       "name": "종사종팔 V4 (공격형)",
       "short_label": "공격형",
-      "trading_date": "2026-11-06",
-      "close": 45.97,
+      "trading_date": "2026-11-09",
+      "close": 56.2,
       "shares": 133,
       "cash": 2040.2800000000047,
-      "holding_value": 6114.01,
-      "total_value": 8154.2900000000045,
+      "holding_value": 7474.6,
+      "total_value": 9514.880000000005,
       "principal": 15000.0,
-      "return_pct": -0.4563806666666664,
+      "return_pct": -0.36567466666666637,
       "filled_buy": null,
-      "unfilled_buy_price": null,
+      "unfilled_buy_price": 50.56,
       "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 5,
-        "for_date": "2026-11-09",
+        "for_date": "2026-11-10",
         "ladder": [
           {
-            "price": 50.56,
-            "qty": 40
+            "price": 61.82,
+            "qty": 33
           },
           {
-            "price": 45.33,
-            "qty": 5
+            "price": 55.14,
+            "qty": 4
           },
           {
-            "price": 40.8,
-            "qty": 5
+            "price": 49.76,
+            "qty": 4
           }
         ]
       },
@@ -90,33 +90,33 @@
       "id": "maemae_stable",
       "name": "4989 매매법 (안정형)",
       "short_label": "안정형",
-      "trading_date": "2026-11-06",
-      "close": 45.97,
+      "trading_date": "2026-11-09",
+      "close": 56.2,
       "shares": 70,
       "cash": 6991.490000000001,
-      "holding_value": 3217.9,
-      "total_value": 10209.390000000001,
+      "holding_value": 3934.0,
+      "total_value": 10925.490000000002,
       "principal": 15000.0,
-      "return_pct": -0.31937399999999994,
+      "return_pct": -0.2716339999999999,
       "filled_buy": null,
-      "unfilled_buy_price": null,
+      "unfilled_buy_price": 45.96,
       "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 4,
-        "for_date": "2026-11-09",
+        "for_date": "2026-11-10",
         "ladder": [
           {
-            "price": 45.96,
-            "qty": 54
+            "price": 56.19,
+            "qty": 44
           },
           {
-            "price": 41.51,
-            "qty": 6
+            "price": 50.83,
+            "qty": 5
           },
           {
-            "price": 37.73,
-            "qty": 6
+            "price": 46.12,
+            "qty": 5
           }
         ]
       },
