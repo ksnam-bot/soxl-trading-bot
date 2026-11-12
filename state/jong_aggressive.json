@@ -1,20 +1,9 @@
 {
   "portfolio_id": "jong_aggressive",
-  "as_of_date": "2026-11-10",
-  "cash": 188.45000000000482,
-  "total_shares": 166,
+  "as_of_date": "2026-11-11",
+  "cash": 4146.210000000005,
+  "total_shares": 106,
   "open_positions": [
-    {
-      "slot": 1,
-      "buy_date": "2026-10-28",
-      "buy_price": 107.35,
-      "qty": 27,
-      "cost": 2898.45,
-      "buy_fee": 2.9,
-      "target_price": 110.25,
-      "cutoff_date": "2026-11-11",
-      "buy_round": 16
-    },
     {
       "slot": 2,
       "buy_date": "2026-10-29",
@@ -47,27 +36,16 @@
       "target_price": 68.49,
       "cutoff_date": "2026-11-18",
       "buy_round": 17
-    },
-    {
-      "slot": 5,
-      "buy_date": "2026-11-10",
-      "buy_price": 56.06,
-      "qty": 33,
-      "cost": 1849.98,
-      "buy_fee": 1.85,
-      "target_price": 57.58,
-      "cutoff_date": "2026-11-24",
-      "buy_round": 18
     }
   ],
   "pending_order": {
-    "slot": 6,
-    "order_price": 57.57,
-    "seed": 188.45000000000482,
-    "for_date": "2026-11-11"
+    "slot": 4,
+    "order_price": 68.47999999999999,
+    "seed": 3160.8614282857143,
+    "for_date": "2026-11-12"
   },
   "compounded_principal": null,
-  "total_day_index": 120,
+  "total_day_index": 121,
   "round_seed_history": {
     "11": 2653.635714,
     "12": 2721.771428285714,
@@ -85,8 +63,9 @@
     "13": 573.49,
     "14": -5616.6,
     "15": -1237.74,
-    "16": 514.61,
-    "17": 372.11
+    "16": -605.7499999999999,
+    "17": 372.11,
+    "18": 324.94
   },
   "history": [
     {
@@ -646,6 +625,36 @@
       "qty": 33,
       "cost": 1849.98,
       "fee": 1.85
+    },
+    {
+      "date": "2026-11-11",
+      "type": "sell",
+      "slot": 1,
+      "buy_date": "2026-10-28",
+      "buy_price": 107.35,
+      "price": 66.03,
+      "qty": 27,
+      "proceeds": 1782.81,
+      "fee": 1.82,
+      "profit": -1120.36,
+      "profit_pct": -0.384909,
+      "reason": "loss_cut",
+      "buy_round": 16
+    },
+    {
+      "date": "2026-11-11",
+      "type": "sell",
+      "slot": 5,
+      "buy_date": "2026-11-10",
+      "buy_price": 56.06,
+      "price": 66.03,
+      "qty": 33,
+      "proceeds": 2178.99,
+      "fee": 2.22,
+      "profit": 324.94,
+      "profit_pct": 0.177845,
+      "reason": "target",
+      "buy_round": 18
     }
   ],
   "equity_log": [
@@ -942,6 +951,13 @@
       "holding_value": 9305.96,
       "total_value": 9494.41,
       "return_pct": -0.367039
+    },
+    {
+      "date": "2026-11-11",
+      "cash": 4146.210000000005,
+      "holding_value": 6999.18,
+      "total_value": 11145.39,
+      "return_pct": -0.256974
     }
   ]
 }
