@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-13T02:43:43.551275+00:00",
+  "generated_at": "2026-11-13T03:30:49.040754+00:00",
   "next_expected_close": {
     "date": "2026-11-13",
     "utc": "2026-11-13T21:00:00+00:00"
   },
   "fx_usdkrw": {
     "date": "2026-11-13",
-    "rate": 1332.38
+    "rate": 1332.08
   },
   "combined": {
     "cash": 8875.700000000006,
@@ -29,23 +29,9 @@
       "total_value": 11087.510000000006,
       "principal": 15000.0,
       "return_pct": -0.26083266666666627,
-      "filled_buy": {
-        "slot": 4,
-        "buy_price": 65.53,
-        "qty": 46
-      },
+      "filled_buy": null,
       "unfilled_buy_price": null,
-      "sells": [
-        {
-          "slot": 2,
-          "sell_price": 65.53,
-          "qty": 28,
-          "reason": "loss_cut",
-          "buy_price": 102.39,
-          "profit": -1036.82,
-          "profit_pct": -0.35999609336849303
-        }
-      ],
+      "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 4,
@@ -104,23 +90,9 @@
       "total_value": 12008.200000000003,
       "principal": 15000.0,
       "return_pct": -0.19945333333333318,
-      "filled_buy": {
-        "slot": 4,
-        "buy_price": 65.53,
-        "qty": 39
-      },
+      "filled_buy": null,
       "unfilled_buy_price": null,
-      "sells": [
-        {
-          "slot": 2,
-          "sell_price": 65.53,
-          "qty": 16,
-          "reason": "loss_cut",
-          "buy_price": 102.39,
-          "profit": -592.47,
-          "profit_pct": -0.35999609336849303
-        }
-      ],
+      "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 4,
