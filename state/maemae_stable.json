@@ -1,20 +1,9 @@
 {
   "portfolio_id": "maemae_stable",
-  "as_of_date": "2026-11-11",
-  "cash": 7424.730000000001,
-  "total_shares": 70,
+  "as_of_date": "2026-11-12",
+  "cash": 5913.910000000002,
+  "total_shares": 93,
   "open_positions": [
-    {
-      "slot": 2,
-      "buy_date": "2026-10-29",
-      "buy_price": 102.39,
-      "qty": 16,
-      "cost": 1638.24,
-      "buy_fee": 1.64,
-      "target_price": 104.95,
-      "cutoff_date": "2026-11-12",
-      "buy_round": null
-    },
     {
       "slot": 2,
       "buy_date": "2026-10-30",
@@ -36,16 +25,27 @@
       "target_price": 68.35,
       "cutoff_date": "2026-11-18",
       "buy_round": null
+    },
+    {
+      "slot": 4,
+      "buy_date": "2026-11-12",
+      "buy_price": 65.53,
+      "qty": 39,
+      "cost": 2555.67,
+      "buy_fee": 2.56,
+      "target_price": 67.17,
+      "cutoff_date": "2026-11-27",
+      "buy_round": null
     }
   ],
   "pending_order": {
     "slot": 4,
-    "order_price": 66.02,
-    "seed": 2577.384,
-    "for_date": "2026-11-12"
+    "order_price": 65.52,
+    "seed": 2458.89,
+    "for_date": "2026-11-13"
   },
-  "compounded_principal": 12886.919999999998,
-  "total_day_index": 46,
+  "compounded_principal": 12294.449999999999,
+  "total_day_index": 47,
   "round_seed_history": {},
   "round_profit_history": {},
   "history": [
@@ -438,6 +438,30 @@
       "profit_pct": 0.177845,
       "reason": "target",
       "buy_round": null
+    },
+    {
+      "date": "2026-11-12",
+      "type": "buy",
+      "slot": 4,
+      "price": 65.53,
+      "qty": 39,
+      "cost": 2555.67,
+      "fee": 2.56
+    },
+    {
+      "date": "2026-11-12",
+      "type": "sell",
+      "slot": 2,
+      "buy_date": "2026-10-29",
+      "buy_price": 102.39,
+      "price": 65.53,
+      "qty": 16,
+      "proceeds": 1048.48,
+      "fee": 1.07,
+      "profit": -592.47,
+      "profit_pct": -0.359996,
+      "reason": "loss_cut",
+      "buy_round": null
     }
   ],
   "equity_log": [
@@ -762,6 +786,13 @@
       "holding_value": 4622.1,
       "total_value": 12046.83,
       "return_pct": -0.196878
+    },
+    {
+      "date": "2026-11-12",
+      "cash": 5913.910000000002,
+      "holding_value": 6094.29,
+      "total_value": 12008.2,
+      "return_pct": -0.199453
     }
   ]
 }
