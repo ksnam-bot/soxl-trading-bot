@@ -1,41 +1,41 @@
 {
-  "generated_at": "2026-11-17T05:10:56.111487+00:00",
+  "generated_at": "2026-11-18T03:45:16.627734+00:00",
   "next_expected_close": {
-    "date": "2026-11-17",
-    "utc": "2026-11-17T21:00:00+00:00"
+    "date": "2026-11-18",
+    "utc": "2026-11-18T21:00:00+00:00"
   },
   "fx_usdkrw": {
-    "date": "2026-11-17",
-    "rate": 1337.35
+    "date": "2026-11-18",
+    "rate": 1329.88
   },
   "combined": {
     "cash": 2589.0700000000065,
     "shares": 339,
-    "holding_value": 16529.64,
-    "total_value": 19118.710000000006,
+    "holding_value": 16634.73,
+    "total_value": 19223.80000000001,
     "principal": 30000.0,
-    "return_pct": -0.36270966666666643
+    "return_pct": -0.35920666666666634
   },
   "portfolios": [
     {
       "id": "jong_aggressive",
       "name": "종사종팔 V4 (공격형)",
       "short_label": "공격형",
-      "trading_date": "2026-11-16",
-      "close": 48.76,
+      "trading_date": "2026-11-17",
+      "close": 49.07,
       "shares": 181,
       "cash": 41.59000000000469,
-      "holding_value": 8825.56,
-      "total_value": 8867.150000000005,
+      "holding_value": 8881.67,
+      "total_value": 8923.260000000006,
       "principal": 15000.0,
-      "return_pct": -0.4088566666666663,
+      "return_pct": -0.40511599999999964,
       "filled_buy": null,
       "unfilled_buy_price": null,
       "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 5,
-        "for_date": "2026-11-17",
+        "for_date": "2026-11-18",
         "ladder": [
           {
             "price": 50.07,
@@ -82,24 +82,24 @@
       "id": "maemae_stable",
       "name": "4989 매매법 (안정형)",
       "short_label": "안정형",
-      "trading_date": "2026-11-16",
-      "close": 48.76,
+      "trading_date": "2026-11-17",
+      "close": 49.07,
       "shares": 158,
       "cash": 2547.480000000002,
-      "holding_value": 7704.08,
-      "total_value": 10251.560000000001,
+      "holding_value": 7753.06,
+      "total_value": 10300.540000000003,
       "principal": 15000.0,
-      "return_pct": -0.3165626666666666,
+      "return_pct": -0.31329733333333315,
       "filled_buy": null,
-      "unfilled_buy_price": null,
+      "unfilled_buy_price": 48.75,
       "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 5,
-        "for_date": "2026-11-17",
+        "for_date": "2026-11-18",
         "ladder": [
           {
-            "price": 48.75,
+            "price": 49.06,
             "qty": 36
           },
           {
