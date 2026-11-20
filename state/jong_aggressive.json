@@ -1,8 +1,8 @@
 {
   "portfolio_id": "jong_aggressive",
-  "as_of_date": "2026-11-18",
-  "cash": 2157.6100000000047,
-  "total_shares": 138,
+  "as_of_date": "2026-11-19",
+  "cash": 207.76000000000454,
+  "total_shares": 181,
   "open_positions": [
     {
       "slot": 4,
@@ -36,16 +36,27 @@
       "target_price": 50.08,
       "cutoff_date": "2026-12-01",
       "buy_round": 18
+    },
+    {
+      "slot": 4,
+      "buy_date": "2026-11-19",
+      "buy_price": 45.3,
+      "qty": 43,
+      "cost": 1947.9,
+      "buy_fee": 1.95,
+      "target_price": 46.53,
+      "cutoff_date": "2026-12-04",
+      "buy_round": 19
     }
   ],
   "pending_order": {
-    "slot": 4,
-    "order_price": 50.07,
-    "seed": 2157.6100000000047,
-    "for_date": "2026-11-19"
+    "slot": 5,
+    "order_price": 46.52,
+    "seed": 207.76000000000454,
+    "for_date": "2026-11-20"
   },
   "compounded_principal": null,
-  "total_day_index": 126,
+  "total_day_index": 127,
   "round_seed_history": {
     "11": 2653.635714,
     "12": 2721.771428285714,
@@ -728,6 +739,15 @@
       "profit_pct": -0.261248,
       "reason": "loss_cut",
       "buy_round": 17
+    },
+    {
+      "date": "2026-11-19",
+      "type": "buy",
+      "slot": 4,
+      "price": 45.3,
+      "qty": 43,
+      "cost": 1947.9,
+      "fee": 1.95
     }
   ],
   "equity_log": [
@@ -1066,6 +1086,13 @@
       "holding_value": 6797.88,
       "total_value": 8955.49,
       "return_pct": -0.402967
+    },
+    {
+      "date": "2026-11-19",
+      "cash": 207.76000000000454,
+      "holding_value": 8199.3,
+      "total_value": 8407.06,
+      "return_pct": -0.439529
     }
   ]
 }
