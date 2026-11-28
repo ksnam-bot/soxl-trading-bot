@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-28T04:02:00.774789+00:00",
+  "generated_at": "2026-11-28T04:52:30.969182+00:00",
   "next_expected_close": {
     "date": "2026-11-30",
     "utc": "2026-11-30T21:00:00+00:00"
@@ -30,36 +30,8 @@
       "principal": 15000.0,
       "return_pct": -0.5398199999999997,
       "filled_buy": null,
-      "unfilled_buy_price": 32.88,
-      "sells": [
-        {
-          "slot": 4,
-          "sell_price": 36.57,
-          "qty": 46,
-          "reason": "loss_cut",
-          "buy_price": 65.53,
-          "profit": -1336.89,
-          "profit_pct": -0.44193499160689764
-        },
-        {
-          "slot": 5,
-          "sell_price": 36.57,
-          "qty": 5,
-          "reason": "target",
-          "buy_price": 32.6,
-          "profit": 19.5,
-          "profit_pct": 0.12177914110429433
-        },
-        {
-          "slot": 6,
-          "sell_price": 36.57,
-          "qty": 2,
-          "reason": "target",
-          "buy_price": 32.02,
-          "profit": 8.97,
-          "profit_pct": 0.1420986883198001
-        }
-      ],
+      "unfilled_buy_price": null,
+      "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 4,
@@ -119,36 +91,8 @@
       "principal": 15000.0,
       "return_pct": -0.38429399999999986,
       "filled_buy": null,
-      "unfilled_buy_price": 32.01,
-      "sells": [
-        {
-          "slot": 4,
-          "sell_price": 36.57,
-          "qty": 39,
-          "reason": "loss_cut",
-          "buy_price": 65.53,
-          "profit": -1133.46,
-          "profit_pct": -0.44193499160689764
-        },
-        {
-          "slot": 5,
-          "sell_price": 36.57,
-          "qty": 51,
-          "reason": "target",
-          "buy_price": 32.6,
-          "profit": 198.91,
-          "profit_pct": 0.12177914110429433
-        },
-        {
-          "slot": 6,
-          "sell_price": 36.57,
-          "qty": 31,
-          "reason": "target",
-          "buy_price": 32.02,
-          "profit": 138.9,
-          "profit_pct": 0.1420986883198001
-        }
-      ],
+      "unfilled_buy_price": null,
+      "sells": [],
       "no_open_slot_today": false,
       "pending_order": {
         "slot": 4,
